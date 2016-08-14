@@ -17,7 +17,7 @@
     <Grid>
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="{Binding ElementName=MainControl, Path=TextFormat, Converter={StaticResource leftPartFormatConverter}}" FontSize="{Binding ElementName=MainControl, Path=FontSize}" Foreground="{Binding ElementName=MainControl, Path=Foreground}" Margin="0" />
-            <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" PreviewMouseWheel="EditPanel_OnPreviewMouseWheel">
                 <l:EditableTextBlock Text="{Binding ElementName=MainControl, Path=StringValue, Mode=TwoWay}" 
                        x:Name="ValueBlock" 
                        HorizontalAlignment="Left"

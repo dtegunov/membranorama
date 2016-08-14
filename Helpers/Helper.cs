@@ -11,14 +11,18 @@ using System.Windows;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Effects;
 using System.Windows.Data;
 using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
+using OpenTK;
+using OpenTK.Graphics;
+using Color = System.Windows.Media.Color;
+using PixelFormat = System.Windows.Media.PixelFormat;
 
 namespace Membranogram
 {
@@ -51,8 +55,8 @@ namespace Membranogram
             return DateTime.Parse(value, NativeDateTimeFormat);
         }
 
-        public static float ToRad = (float)Math.PI / 180.0f;
-        public static float ToDeg = 180.0f / (float)Math.PI;
+        public static Func<float, float> ToRad = x => x * (float)Math.PI / 180.0f;
+        public static Func<float, float> ToDeg = x => x * 180.0f / (float)Math.PI;
 
         public static void Swap<T>(ref T lhs, ref T rhs)
         {
@@ -76,167 +80,117 @@ namespace Membranogram
         {
             return Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
         }
-    }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct int3
-    {
-        public int X, Y, Z;
-
-        public int3(int x, int y, int z)
+        public static bool MouseLeftDown()
         {
-            X = x;
-            Y = y;
-            Z = z;
+            return Mouse.LeftButton == MouseButtonState.Pressed;
         }
 
-        public int3(byte[] value)
+        public static bool MouseRightDown()
         {
-            X = BitConverter.ToInt32(value, 0);
-            Y = BitConverter.ToInt32(value, sizeof(float));
-            Z = BitConverter.ToInt32(value, 2 * sizeof(float));
+            return Mouse.RightButton == MouseButtonState.Pressed;
         }
 
-        public ulong Elements()
+        public static Color SpectrumColor(int w, float alpha)
         {
-            return (ulong)X * (ulong)Y * (ulong)Z;
+            float r = 0.0f;
+            float g = 0.0f;
+            float b = 0.0f;
+
+            w += 2; // Don't start with pink!
+            w *= 15;
+            w = w % 100;
+
+            if (w < 17)
+            {
+                r = -(w - 17.0f) / 17.0f;
+                b = 1.0f;
+            }
+            else if (w < 33)
+            {
+                g = (w - 17.0f) / (33.0f - 17.0f);
+                b = 1.0f;
+            }
+            else if (w < 50)
+            {
+                g = 1.0f;
+                b = -(w - 50.0f) / (50.0f - 33.0f);
+            }
+            else if (w < 67)
+            {
+                r = (w - 50.0f) / (67.0f - 50.0f);
+                g = 1.0f;
+            }
+            else if (w < 83)
+            {
+                r = 1.0f;
+                g = -(w - 83.0f) / (83.0f - 67.0f);
+            }
+            else
+            {
+                r = 1.0f;
+                b = (w - 83.0f) / (100.0f - 83.0f);
+            }
+
+            return Color.FromScRgb(alpha, r, g, b);
         }
 
-        public uint ElementN(int3 position)
+        public static Vector4 ColorToVector(Color color, bool ignoreAlpha = false)
         {
-            return ((uint)position.Z * (uint)Y + (uint)position.Y) * (uint)X + (uint)position.X;
+            return new Vector4(color.ScR, color.ScG, color.ScB, ignoreAlpha ? 1.0f : color.ScA);
         }
 
-        public ulong ElementNLong(int3 position)
+        public static Vector2 Reciprocal(Vector2 v)
         {
-            return ((ulong)position.Z * (ulong)Y + (ulong)position.Y) * (ulong)X + (ulong)position.X;
+            return new Vector2(1f / v.X, 1f / v.Y);
         }
 
-        public static implicit operator byte[](int3 value)
+        public static Vector3 Reciprocal(Vector3 v)
         {
-            byte[] Bytes = new byte[3 * sizeof(int)];
-            Array.Copy(BitConverter.GetBytes(value.X), 0, Bytes, 0, sizeof(int));
-            Array.Copy(BitConverter.GetBytes(value.Y), 0, Bytes, sizeof(int), sizeof(int));
-            Array.Copy(BitConverter.GetBytes(value.Z), 0, Bytes, 2 * sizeof(int), sizeof(int));
-
-            return Bytes;
+            return new Vector3(1f / v.X, 1f / v.Y, 1f / v.Z);
         }
 
-        public override bool Equals(Object obj)
+        public static Vector4 Reciprocal(Vector4 v)
         {
-            return obj is int3 && this == (int3)obj;
+            return new Vector4(1f / v.X, 1f / v.Y, 1f / v.Z, 1f / v.W);
         }
 
-        public static bool operator ==(int3 o1, int3 o2)
+        public static Vector2 Reciprocal(int2 v)
         {
-            return o1.X == o2.X && o1.Y == o2.Y && o1.Z == o2.Z;
+            return new Vector2(1f / v.X, 1f / v.Y);
         }
 
-        public static bool operator !=(int3 o1, int3 o2)
+        public static Vector3 Reciprocal(int3 v)
         {
-            return !(o1 == o2);
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct int2
-    {
-        public int X, Y;
-
-        public int2(int x, int y)
-        {
-            X = x;
-            Y = y;
+            return new Vector3(1f / v.X, 1f / v.Y, 1f / v.Z);
         }
 
-        public int2(byte[] value)
+        public static float[] Extract(float[] volume, int3 dimsvolume, int3 centerextract, int3 dimsextract)
         {
-            X = BitConverter.ToInt32(value, 0);
-            Y = BitConverter.ToInt32(value, sizeof(float));
-        }
+            int3 Origin = new int3(centerextract.X - dimsextract.X / 2,
+                                   centerextract.Y - dimsextract.Y / 2,
+                                   centerextract.Z - dimsextract.Z / 2);
 
-        public ulong Elements()
-        {
-            return (ulong)X * (ulong)Y;
-        }
+            float[] Extracted = new float[dimsextract.Elements()];
 
-        public uint ElementN(int2 position)
-        {
-            return (uint)position.Y * (uint)X + (uint)position.X;
-        }
+            unsafe
+            {
+                fixed (float* volumePtr = volume)
+                fixed (float* ExtractedPtr = Extracted)
+                for (int z = 0; z < dimsextract.Z; z++)
+                    for (int y = 0; y < dimsextract.Y; y++)
+                        for (int x = 0; x < dimsextract.X; x++)
+                        {
+                            int3 Pos = new int3((Origin.X + x + dimsvolume.X) % dimsvolume.X,
+                                                (Origin.Y + y + dimsvolume.Y) % dimsvolume.Y,
+                                                (Origin.Z + z + dimsvolume.Z) % dimsvolume.Z);
 
-        public ulong ElementNLong(int2 position)
-        {
-            return (ulong)position.Y * (ulong)X + (ulong)position.X;
-        }
+                            float Val = volumePtr[(Pos.Z * dimsvolume.Y + Pos.Y) * dimsvolume.X + Pos.X];
+                            ExtractedPtr[(z * dimsextract.Y + y) * dimsextract.X + x] = Val;
+                        }
+            }
 
-        public static implicit operator byte[](int2 value)
-        {
-            byte[] Bytes = new byte[2 * sizeof(int)];
-            Array.Copy(BitConverter.GetBytes(value.X), 0, Bytes, 0, sizeof(int));
-            Array.Copy(BitConverter.GetBytes(value.Y), 0, Bytes, sizeof(int), sizeof(int));
-
-            return Bytes;
-        }
-
-        public override bool Equals(Object obj)
-        {
-            return obj is int2 && this == (int2)obj;
-        }
-
-        public static bool operator ==(int2 o1, int2 o2)
-        {
-            return o1.X == o2.X && o1.Y == o2.Y;
-        }
-
-        public static bool operator !=(int2 o1, int2 o2)
-        {
-            return !(o1 == o2);
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct float3
-    {
-        public float X, Y, Z;
-
-        public float3(float x, float y, float z)
-        {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
-        public float3(byte[] value)
-        {
-            X = BitConverter.ToSingle(value, 0);
-            Y = BitConverter.ToSingle(value, sizeof(float));
-            Z = BitConverter.ToSingle(value, 2 * sizeof(float));
-        }
-
-        public static implicit operator byte[](float3 value)
-        {
-            byte[] Bytes = new byte[3 * sizeof(float)];
-            Array.Copy(BitConverter.GetBytes(value.X), 0, Bytes, 0, sizeof(float));
-            Array.Copy(BitConverter.GetBytes(value.Y), 0, Bytes, sizeof(int), sizeof(float));
-            Array.Copy(BitConverter.GetBytes(value.Z), 0, Bytes, 2 * sizeof(int), sizeof(float));
-
-            return Bytes;
-        }
-
-        public override bool Equals(Object obj)
-        {
-            return obj is float3 && this == (float3)obj;
-        }
-
-        public static bool operator ==(float3 o1, float3 o2)
-        {
-            return o1.X == o2.X && o1.Y == o2.Y && o1.Z == o2.Z;
-        }
-
-        public static bool operator !=(float3 o1, float3 o2)
-        {
-            return !(o1 == o2);
+            return Extracted;
         }
     }
 
@@ -346,7 +300,7 @@ namespace Membranogram
         public static void WriteMapFloat(string path, MapHeader header, float[] data)
         {
             Type ValueType = header.GetValueType();
-            ulong Elements = header.Dimensions.Elements();
+            long Elements = header.Dimensions.Elements();
 
             using(BinaryWriter Writer = new BinaryWriter(File.Create(path)))
             {
@@ -376,37 +330,37 @@ namespace Membranogram
                         if (ValueType == typeof(byte))
                         {
                             byte* BytesP = BytesPtr;
-                            for (ulong i = 0; i < Elements; i++)
+                            for (long i = 0; i < Elements; i++)
                                 *BytesP++ = (byte)*DataP++;
                         }
                         else if (ValueType == typeof(short))
                         {
                             short* BytesP = (short*)BytesPtr;
-                            for (ulong i = 0; i < Elements; i++)
+                            for (long i = 0; i < Elements; i++)
                                 *BytesP++ = (short)*DataP++;
                         }
                         else if (ValueType == typeof(ushort))
                         {
                             ushort* BytesP = (ushort*)BytesPtr;
-                            for (ulong i = 0; i < Elements; i++)
+                            for (long i = 0; i < Elements; i++)
                                 *BytesP++ = (ushort)Math.Min(Math.Max(0f, *DataP++ * 16f), 65536f);
                         }
                         else if (ValueType == typeof(int))
                         {
                             int* BytesP = (int*)BytesPtr;
-                            for (ulong i = 0; i < Elements; i++)
+                            for (long i = 0; i < Elements; i++)
                                 *BytesP++ = (int)*DataP++;
                         }
                         else if (ValueType == typeof(float))
                         {
                             float* BytesP = (float*)BytesPtr;
-                            for (ulong i = 0; i < Elements; i++)
+                            for (long i = 0; i < Elements; i++)
                                 *BytesP++ = *DataP++;
                         }
                         else if (ValueType == typeof(double))
                         {
                             double* BytesP = (double*)BytesPtr;
-                            for (ulong i = 0; i < Elements; i++)
+                            for (long i = 0; i < Elements; i++)
                                 *BytesP++ = (double)*DataP++;
                         }
                     }
@@ -425,6 +379,12 @@ namespace Membranogram
                                 m.M21, m.M22, m.M23, m.M24,
                                 m.M31, m.M32, m.M33, m.M34,
                                 m.M41, m.M42, m.M43, m.M44 };
+        }
+        public static float[] ToFloatArray(OpenTK.Matrix3 m)
+        {
+            return new float[]{ m.M11, m.M12, m.M13,
+                                m.M21, m.M22, m.M23,
+                                m.M31, m.M32, m.M33 };
         }
     }
 }

@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:m="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:s="clr-namespace:Sparta"
-        Title="Membranorama" Height="1000" Width="1600" BorderThickness="0.5" BorderBrush="{DynamicResource AccentColorBrush}">
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        Title="Membranorama" Height="1100" Width="1600" BorderThickness="0.5" BorderBrush="{DynamicResource AccentColorBrush}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -34,11 +35,11 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" />
+                <Setter Property="Foreground" Value="#0066cc" />
                 <Setter Property="Cursor" Value="Hand" />
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="true">
-                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                        <Setter Property="Foreground" Value="#3399ff" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="Button">
@@ -56,81 +57,335 @@
             </Style>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Margin="8">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="80" />
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Orientation="Vertical">
-                <TextBlock Text="Surface" FontSize="20" />
-                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                    <s:ValueSlider Value="{Binding Path=SurfaceOffset, Mode=TwoWay}" TextFormat="Offset surface by {0} px." MinValue="-1000" MaxValue="1000" UpdateTrigger="PropertyChanged" />
-                </StackPanel>
-                <StackPanel Height="5" />
-                <TextBlock Text="Tracing" FontSize="20" />
-                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                    <s:ValueSlider Value="{Binding Path=TraceDepth, Mode=TwoWay}" TextFormat="{}{0} px thick shell, " MinValue="0" MaxValue="1000" UpdateTrigger="PropertyChanged" />
-                    <s:ValueSlider Value="{Binding Path=TraceDepthOffset, Mode=TwoWay}" TextFormat="offset by {0} px." MinValue="-1000" MaxValue="1000" UpdateTrigger="PropertyChanged" />
-                </StackPanel>
-                <StackPanel Height="5" />
-                <TextBlock Text="Display" FontSize="20" />
-                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                    <s:ValueSlider Value="{Binding Path=OutputRangeMin, Mode=TwoWay}" TextFormat="Normalize image within {0}—" MinValue="0" MaxValue="0.99" StepSize="0.01" UpdateTrigger="PropertyChanged" />
-                    <s:ValueSlider Value="{Binding Path=OutputRangeMax, Mode=TwoWay}" TextFormat="{}{0}." MinValue="0.01" MaxValue="1" StepSize="0.01" UpdateTrigger="PropertyChanged" />
-                </StackPanel>
-                <s:ValueSlider Value="{Binding Path=OutputLight, Mode=TwoWay}" TextFormat="Add {0} % lighting." MinValue="0" MaxValue="100" Margin="0,6,0,0" UpdateTrigger="PropertyChanged" />
-                <StackPanel Height="5" />
-                <TextBlock Text="Selection" FontSize="20" />
-                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                    <TextBlock Text="Position at cursor: " />
-                    <TextBlock Name="TextCursorPosition" />
-                </StackPanel>
-                <TextBlock Name="TextSelectionStats" Margin="0,6,0,0" />
-                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                    <Button Name="ButtonSelectionGrow" Content="GROW" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Click="ButtonSelectionGrow_Click" />
-                    <Button Name="ButtonSelectionShrink" Content="SHRINK" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonSelectionShrink_Click" />
-                    <Button Name="ButtonSelectionInvert" Content="INVERT" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonSelectionInvert_Click" />
-                    <Button Name="ButtonSelectionClear" Content="CLEAR" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonSelectionClear_Click" />
-                </StackPanel>
-                <s:ValueSlider Value="{Binding Path=SelectionAngle, Mode=TwoWay}" TextFormat="Don't grow if angle is over {0} °." MinValue="0" MaxValue="180" Margin="0,6,0,0" UpdateTrigger="PropertyChanged" />
-                <StackPanel Height="5" />
-                <TextBlock Text="Points" FontSize="20" />
-                <ListBox Name="ListBoxPoints" ItemsSource="{Binding Path=SurfacePoints}" BorderThickness="0.5" BorderBrush="{DynamicResource AccentColorBrush}" MaxHeight="200" MinHeight="100" SelectionMode="Extended" HorizontalAlignment="Stretch" Margin="0,6,0,0" SelectionChanged="ListBoxPoints_SelectionChanged">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Text="{Binding Path=Text}" Margin="0" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.ItemContainerStyle>
-                        <Style>
-                            <Style.Resources>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
-                            </Style.Resources>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
-                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                    <Button Name="ButtonPointsExport" Content="EXPORT" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Click="ButtonPointsExport_Click" />
-                    <Button Name="ButtonPointsRemove" Content="REMOVE" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonPointsRemove_Click" />
-                </StackPanel>
-            </StackPanel>
-            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <TextBlock Text="Files" FontSize="20" />
-                <Button Name="ButtonMeshPath" Style="{StaticResource HyperlinkLikeButton}" Margin="0,6,0,0" Click="ButtonMeshPath_Click">
-                    <TextBlock Name="ButtonMeshPathText" TextTrimming="CharacterEllipsis">Load Surface...</TextBlock>
-                </Button>
-                <Button Name="ButtonTomogramPath" Style="{StaticResource HyperlinkLikeButton}" Margin="0,6,0,0" Click="ButtonTomogramPath_Click">
-                    <TextBlock Name="ButtonTomogramPathText" TextTrimming="CharacterEllipsis">Load Tomogram...</TextBlock>
-                </Button>
-            </StackPanel>
-        </Grid>
-        <WindowsFormsHost Name="ViewportHost" Grid.Column="1" Panel.ZIndex="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,2,2" Initialized="ViewportHost_Initialized" />
-    </Grid>
+    <m:MetroWindow.RightWindowCommands>
+        <m:WindowCommands>
+            <Button Name="ButtonScreenshot" Style="{StaticResource ChromelessButtonStyle}" Margin="10,0" Focusable="False" ToolTip="Make Screenshot" Click="ButtonScreenshot_OnClick">
+                <Canvas Width="16" Height="16">
+                    <Path Width="16" Height="16" Stretch="Uniform" Data="M13.73,15L9.83,21.76C10.53,21.91 11.25,22 12,22C14.4,22 16.6,21.15 18.32,19.75L14.66,13.4M2.46,15C3.38,17.92 5.61,20.26 8.45,21.34L12.12,15M8.54,12L4.64,5.25C3,7 2,9.39 2,12C2,12.68 2.07,13.35 2.2,14H9.69M21.8,10H14.31L14.6,10.5L19.36,18.75C21,16.97 22,14.6 22,12C22,11.31 21.93,10.64 21.8,10M21.54,9C20.62,6.07 18.39,3.74 15.55,2.66L11.88,9M9.4,10.5L14.17,2.24C13.47,2.09 12.75,2 12,2C9.6,2 7.4,2.84 5.68,4.25L9.34,10.6L9.4,10.5Z" Fill="Black" />
+                </Canvas>
+            </Button>
+        </m:WindowCommands>
+    </m:MetroWindow.RightWindowCommands>
+    <TabControl x:Name="TabsMain" Margin="4,4">
+        <TabItem Header="Membranogram">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" Margin="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="120" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Vertical">
+                        <TextBlock Text="Surface" FontSize="20" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <s:ValueSlider Value="{Binding Path=Membrane.SurfaceOffset, Mode=TwoWay}" TextFormat="Offset surface by {0} px." MinValue="-1000" MaxValue="1000" StepSize="0.25" UpdateTrigger="PropertyChanged" />
+                        </StackPanel>
+                        <StackPanel Height="5" />
+                        <TextBlock Text="Tracing" FontSize="20" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <s:ValueSlider Value="{Binding Path=Membrane.TraceDepth, Mode=TwoWay}" TextFormat="{}{0} px thick shell, " MinValue="0" MaxValue="1000" UpdateTrigger="PropertyChanged" />
+                            <s:ValueSlider Value="{Binding Path=Membrane.TraceDepthOffset, Mode=TwoWay}" TextFormat="offset by {0} px." MinValue="-1000" MaxValue="1000" UpdateTrigger="PropertyChanged" />
+                        </StackPanel>
+                        <s:ValueSlider Value="{Binding Path=Membrane.TraceSharpening, Mode=TwoWay}" TextFormat="Apply {0} % sharpening." MinValue="0" MaxValue="300" StepSize="10" Margin="0,6,0,0" UpdateTrigger="PropertyChanged" />
+                        <StackPanel Height="5" />
+                        <TextBlock Text="Display" FontSize="20" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <s:ValueSlider Value="{Binding Path=Membrane.OutputRangeMin, Mode=TwoWay}" TextFormat="Normalize image within {0}—" MinValue="-3" MaxValue="2.99" StepSize="0.01" UpdateTrigger="PropertyChanged" />
+                            <s:ValueSlider Value="{Binding Path=Membrane.OutputRangeMax, Mode=TwoWay}" TextFormat="{}{0}." MinValue="-2.99" MaxValue="3" StepSize="0.01" UpdateTrigger="PropertyChanged" />
+                        </StackPanel>
+                        <s:ValueSlider Value="{Binding Path=Membrane.OutputLight, Mode=TwoWay}" TextFormat="Add {0} % lighting." MinValue="0" MaxValue="100" Margin="0,6,0,0" UpdateTrigger="PropertyChanged" />
+                        <StackPanel Height="5" />
+                        <TextBlock Text="Selection" FontSize="20" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <TextBlock Text="Position at cursor: " />
+                            <TextBlock Name="TextCursorPosition" />
+                        </StackPanel>
+                        <TextBlock Name="TextSelectionStats" Margin="0,6,0,0" Text="0 faces, 0.0 Å²." />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Name="ButtonSelectionFill" Content="FILL" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Click="ButtonSelectionFill_Click" />
+                            <Button Name="ButtonSelectionGrow" Content="GROW" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonSelectionGrow_Click" />
+                            <Button Name="ButtonSelectionShrink" Content="SHRINK" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonSelectionShrink_Click" />
+                            <Button Name="ButtonSelectionInvert" Content="INVERT" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonSelectionInvert_Click" />
+                            <Button Name="ButtonSelectionClear" Content="CLEAR" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonSelectionClear_Click" />
+                        </StackPanel>
+                        <s:ValueSlider Value="{Binding Path=Membrane.SelectionAngle, Mode=TwoWay}" TextFormat="Don't grow if angle is over {0} °." MinValue="0" MaxValue="180" Margin="0,6,0,0" UpdateTrigger="PropertyChanged" />
+                        <StackPanel Height="5" />
+                        <TextBlock Text="Point Groups" FontSize="20" />
+                        <ListView Name="ListViewPointGroups" ItemsSource="{Binding Path=Membrane.PointGroups}" BorderThickness="0.0" MaxHeight="100" MinHeight="50" SelectionMode="Single" HorizontalAlignment="Stretch" Margin="0,6,0,0" SelectionChanged="ListViewPointGroups_OnSelectionChanged">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="150">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Left">
+                                                <TextBlock Text="Name" Margin="5,0,0,0" />
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <s:EditableTextBlock Text="{Binding Path=Name, Mode=TwoWay}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="40">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Left">
+                                                <TextBlock Text="Size" Margin="5,0,0,0" />
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <s:ValueSlider Value="{Binding Path=Size, Mode=TwoWay}" TextFormat="{}{0}" MinValue="1" MaxValue="999" StepSize="1" UpdateTrigger="PropertyChanged" Margin="0" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="40">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Left">
+                                                <TextBlock Text="Color" Margin="5,0,0,0" />
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <xctk:ColorPicker x:Name="ColorPickerPointGroup" SelectedColor="{Binding Path=Color, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ColorMode="ColorCanvas" ButtonStyle="{StaticResource ChromelessButtonStyle}" Width="20" Margin="0" SelectedColorChanged="ColorPickerPointGroup_OnSelectedColorChanged" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="30">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Left">
+                                                <TextBlock Text="N" Margin="5,0,0,0" />
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Path=PointCount}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="30">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Center">
+                                                <Canvas Width="20" Height="10">
+                                                    <Path Width="16" Height="10" Canvas.Left="2" Canvas.Top="0" Stretch="Fill" Fill="DimGray" Data="F1 M 38,33.1538C 40.6765,33.1538 42.8462,35.3235 42.8462,38C 42.8462,40.6765 40.6765,42.8461 38,42.8461C 35.3235,42.8461 33.1539,40.6765 33.1539,38C 33.1539,35.3235 35.3236,33.1538 38,33.1538 Z M 38,25.0769C 49.3077,25.0769 59,33.1538 59,38C 59,42.8461 49.3077,50.9231 38,50.9231C 26.6923,50.9231 17,42.8461 17,38C 17,33.1538 26.6923,25.0769 38,25.0769 Z M 38,29.1154C 33.0932,29.1154 29.1154,33.0932 29.1154,38C 29.1154,42.9068 33.0932,46.8846 38,46.8846C 42.9068,46.8846 46.8846,42.9068 46.8846,38C 46.8846,33.0932 42.9068,29.1154 38,29.1154 Z "/>
+                                                </Canvas>
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Path=IsVisible}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="90">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Left">
+                                                <TextBlock Text="Depiction" Margin="5,0,0,0" />
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Name="ButtonPointGroupDepiction" Style="{StaticResource HyperlinkLikeButton}" Margin="0,0,0,0" Click="ButtonPointGroupDepiction_OnClick">
+                                                    <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding DepictionString}"></TextBlock>
+                                                </Button>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridView.ColumnHeaderContainerStyle>
+                                        <Style>
+                                            <Setter Property="TextElement.FontWeight" Value="Normal" />
+                                        </Style>
+                                    </GridView.ColumnHeaderContainerStyle>
+                                </GridView>
+                            </ListView.View>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Style.Resources>
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                    </Style.Resources>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                        </ListView>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Name="ButtonPointGroupsAdd" Content="ADD" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Click="ButtonPointGroupsAdd_OnClick" />
+                            <Button Name="ButtonPointGroupsRemove" Content="REMOVE" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonPointGroupsRemove_OnClick" />
+                            <Button Name="ButtonPointGroupsImport" Content="IMPORT" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonPointGroupsImport_OnClick" />
+                        </StackPanel>
+                        <StackPanel Height="10" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Points in " FontSize="20" />
+                            <TextBlock Text="{Binding Path=Membrane.ActiveGroup.Name}" FontSize="20" />
+                        </StackPanel>
+                        <ListView Name="ListViewPoints" ItemsSource="{Binding Path=Membrane.ActiveGroup.Points}" BorderThickness="0.0" MaxHeight="200" MinHeight="100" SelectionMode="Extended" HorizontalAlignment="Stretch" Margin="0,6,0,0" SelectionChanged="ListViewPoints_SelectionChanged">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="X" Width="54" DisplayMemberBinding="{Binding Path=PositionXText}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Path=PositionXText}" Margin="-1" TextAlignment="Right" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Y" Width="54">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Path=PositionYText}" Margin="-1" TextAlignment="Right" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Z" Width="54">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Path=PositionZText}" Margin="-1" TextAlignment="Right" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Offset" Width="40">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Path=OffsetText}" Margin="-1" TextAlignment="Right" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridView.ColumnHeaderContainerStyle>
+                                        <Style>
+                                            <Setter Property="TextElement.FontWeight" Value="Normal" />
+                                        </Style>
+                                    </GridView.ColumnHeaderContainerStyle>
+                                </GridView>
+                            </ListView.View>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Style.Resources>
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                    </Style.Resources>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ContextMenu>
+                                <ContextMenu Name="ContextMenuSurfacePoint" />
+                            </ListView.ContextMenu>
+                        </ListView>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Name="ButtonPointsExport" Content="EXPORT" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Click="ButtonPointsExport_Click" />
+                            <Button Name="ButtonPointsRemove" Content="REMOVE" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonPointsRemove_Click" />
+                        </StackPanel>
+                        <StackPanel Height="10" />
+                        <TextBlock Text="Surface Patches" FontSize="20" />
+                        <ListView Name="ListViewPatches" ItemsSource="{Binding Path=Membrane.Patches}" BorderThickness="0.0" MaxHeight="100" MinHeight="50" SelectionMode="Single" HorizontalAlignment="Stretch" Margin="0,6,0,0" SelectionChanged="ListViewPatches_OnSelectionChanged">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="140">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Left">
+                                                <TextBlock Text="Name" Margin="5,0,0,0" />
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <s:EditableTextBlock Text="{Binding Path=Name, Mode=TwoWay}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="60">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Left">
+                                                <TextBlock Text="Area" Margin="5,0,0,0" />
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Path=SurfaceArea}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="55">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Left">
+                                                <TextBlock Text="Color" Margin="5,0,0,0" />
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <xctk:ColorPicker x:Name="ColorPickerPatch" SelectedColor="{Binding Path=Color, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ColorMode="ColorCanvas" ButtonStyle="{StaticResource ChromelessButtonStyle}" Width="20" Margin="0" SelectedColorChanged="ColorPickerPatch_OnSelectedColorChanged" />
+                                                    <CheckBox Name="CheckPatchColored" IsChecked="{Binding Path=IsColored}" Margin="4,0,0,0" Checked="CheckPatchColored_OnChecked" Unchecked="CheckPatchColored_OnChecked" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="30">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader HorizontalContentAlignment="Center">
+                                                <Canvas Width="20" Height="10">
+                                                    <Path Width="16" Height="10" Canvas.Left="2" Canvas.Top="0" Stretch="Fill" Fill="DimGray" Data="F1 M 38,33.1538C 40.6765,33.1538 42.8462,35.3235 42.8462,38C 42.8462,40.6765 40.6765,42.8461 38,42.8461C 35.3235,42.8461 33.1539,40.6765 33.1539,38C 33.1539,35.3235 35.3236,33.1538 38,33.1538 Z M 38,25.0769C 49.3077,25.0769 59,33.1538 59,38C 59,42.8461 49.3077,50.9231 38,50.9231C 26.6923,50.9231 17,42.8461 17,38C 17,33.1538 26.6923,25.0769 38,25.0769 Z M 38,29.1154C 33.0932,29.1154 29.1154,33.0932 29.1154,38C 29.1154,42.9068 33.0932,46.8846 38,46.8846C 42.9068,46.8846 46.8846,42.9068 46.8846,38C 46.8846,33.0932 42.9068,29.1154 38,29.1154 Z "/>
+                                                </Canvas>
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Path=IsVisible}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="" Width="30">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Name="ButtonPatchShow" Style="{StaticResource ChromelessButtonStyle}" Margin="-2,-2,0,0" Click="ButtonPatchShow_OnClick">
+                                                    <Button.Content>
+                                                        <Canvas Width="22" Height="18">
+                                                            <Path Width="18" Height="18" Canvas.Left="2" Canvas.Top="0" Stretch="Fill" Fill="DimGray" Data="F1 M 44.3333,19L 57,19L 57,31.6667L 52.25,36.4167L 52.25,27.7083L 34.8333,45.125L 30.875,41.1667L 48.2917,23.75L 39.5833,23.75L 44.3333,19 Z M 19,25.3333L 42.75,25.3333L 38,30.0833L 23.75,30.0833L 23.75,52.25L 45.9167,52.25L 45.9167,38L 50.6667,33.25L 50.6667,57L 19,57L 19,25.3333 Z "/>
+                                                        </Canvas>
+                                                    </Button.Content>
+                                                </Button>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridView.ColumnHeaderContainerStyle>
+                                        <Style>
+                                            <Setter Property="TextElement.FontWeight" Value="Normal" />
+                                        </Style>
+                                    </GridView.ColumnHeaderContainerStyle>
+                                </GridView>
+                            </ListView.View>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Style.Resources>
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                    </Style.Resources>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                        </ListView>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Name="ButtonPatchAdd" Content="ADD FROM SELECTION" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Click="ButtonPatchAdd_OnClick" />
+                            <Button Name="ButtonPatchRemove" Content="REMOVE" FontWeight="Medium" Style="{StaticResource ChromelessButtonStyle}" Margin="8,0,0,0" Click="ButtonPatchRemove_OnClick" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <TextBlock Text="Files" FontSize="20" />
+                        <Button Name="ButtonMeshPath" Style="{StaticResource HyperlinkLikeButton}" Margin="0,6,0,0" Click="ButtonMeshPath_Click">
+                            <TextBlock Name="ButtonMeshPathText" TextTrimming="CharacterEllipsis">Load Surface</TextBlock>
+                        </Button>
+                        <Button Name="ButtonTomogramPath" Style="{StaticResource HyperlinkLikeButton}" Margin="0,6,0,0" Click="ButtonTomogramPath_Click">
+                            <TextBlock Name="ButtonTomogramPathText" TextTrimming="CharacterEllipsis">Load Tomogram</TextBlock>
+                        </Button>
+                        <Button Name="ButtonLoadSession" Style="{StaticResource HyperlinkLikeButton}" Margin="0,6,0,0" Click="ButtonLoadSession_OnClick">
+                            <TextBlock>Load Session</TextBlock>
+                        </Button>
+                        <Button Name="ButtonSaveSession" Style="{StaticResource HyperlinkLikeButton}" Margin="0,6,0,0" Click="ButtonSaveSession_OnClick">
+                            <TextBlock>Save Session</TextBlock>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                <WindowsFormsHost Name="ViewportHost" Grid.Column="1" Panel.ZIndex="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,2,2" Initialized="ViewportHost_Initialized" />
+            </Grid>
+        </TabItem>
+        <TabItem Header="Subtomogram">
+            
+        </TabItem>
+    </TabControl>
 </m:MetroWindow>

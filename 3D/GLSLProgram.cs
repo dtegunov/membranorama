@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 
@@ -11,82 +7,150 @@ namespace Membranogram
 {
     public class GLSLProgram
     {
-	    public static int CompileProgram(string pathVS, string pathTSControl, string pathTSEval, string pathGS, string pathFS)
+        private int Handle;
+
+	    public GLSLProgram(string pathVS, string pathTSControl, string pathTSEval, string pathGS, string pathFS)
 	    {
-			int vertexShader = 0, tesselationControlShader = 0, tesselationEvalShader = 0, geometryShader = 0, fragmentShader = 0;
-			int shaderProgram = GL.CreateProgram();
+			int VertexShader = 0, TesselationControlShader = 0, TesselationEvalShader = 0, GeometryShader = 0, FragmentShader = 0;
+			int ShaderProgram = GL.CreateProgram();
 		
 			// Load and compile individual shaders:
 			
 			if (pathVS != null)
 			{
-				vertexShader = GL.CreateShader(ShaderType.VertexShader);
-				GL.ShaderSource(vertexShader, 1, new string[] { GetText(pathVS) }, new int[0]);
-				GL.CompileShader(vertexShader);
+				VertexShader = GL.CreateShader(ShaderType.VertexShader);
+				GL.ShaderSource(VertexShader, 1, new[] { GetText(pathVS) }, new int[0]);
+				GL.CompileShader(VertexShader);
 				
-				GL.AttachShader(shaderProgram, vertexShader);
+				GL.AttachShader(ShaderProgram, VertexShader);
 			}			
 			
 			if (pathTSControl != null && pathTSEval != null)
 			{
-				tesselationControlShader = GL.CreateShader(ShaderType.TessControlShader);
-				GL.ShaderSource(tesselationControlShader, 1, new string[] { GetText(pathTSControl) }, new int[0]);
-				GL.CompileShader(tesselationControlShader);
+				TesselationControlShader = GL.CreateShader(ShaderType.TessControlShader);
+				GL.ShaderSource(TesselationControlShader, 1, new[] { GetText(pathTSControl) }, new int[0]);
+				GL.CompileShader(TesselationControlShader);
 
-				tesselationEvalShader = GL.CreateShader(ShaderType.TessEvaluationShader);
-				GL.ShaderSource(tesselationEvalShader, 1, new string[] { GetText(pathTSEval) }, new int[0]);
-				GL.CompileShader(tesselationEvalShader);
+				TesselationEvalShader = GL.CreateShader(ShaderType.TessEvaluationShader);
+				GL.ShaderSource(TesselationEvalShader, 1, new[] { GetText(pathTSEval) }, new int[0]);
+				GL.CompileShader(TesselationEvalShader);
 				
-				GL.AttachShader(shaderProgram, tesselationControlShader);
-				GL.AttachShader(shaderProgram, tesselationEvalShader);
+				GL.AttachShader(ShaderProgram, TesselationControlShader);
+				GL.AttachShader(ShaderProgram, TesselationEvalShader);
 			}
 			
 			if (pathGS != null)
 			{
-				geometryShader = GL.CreateShader(ShaderType.GeometryShader);
-				GL.ShaderSource(geometryShader, 1, new string[] { GetText(pathGS) }, new int[0]);
-				GL.CompileShader(geometryShader);
+				GeometryShader = GL.CreateShader(ShaderType.GeometryShader);
+				GL.ShaderSource(GeometryShader, 1, new[] { GetText(pathGS) }, new int[0]);
+				GL.CompileShader(GeometryShader);
 				
-				GL.AttachShader(shaderProgram, geometryShader);
+				GL.AttachShader(ShaderProgram, GeometryShader);
 			}
 			
 			if (pathFS != null)
 			{
-				fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-				GL.ShaderSource(fragmentShader, 1, new string[] { GetText(pathFS) }, new int[0]);
-				GL.CompileShader(fragmentShader);
+				FragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+				GL.ShaderSource(FragmentShader, 1, new[] { GetText(pathFS) }, new int[0]);
+				GL.CompileShader(FragmentShader);
 				
-				GL.AttachShader(shaderProgram, fragmentShader);
+				GL.AttachShader(ShaderProgram, FragmentShader);
 			}
 			
 			// Link overall program:
 			
-			GL.LinkProgram(shaderProgram);
-			GL.ValidateProgram(shaderProgram);
+			GL.LinkProgram(ShaderProgram);
+			GL.ValidateProgram(ShaderProgram);
 			
 			// Delete shaders:
 			
 			if (pathVS != null)
-				GL.DeleteShader(vertexShader);
+				GL.DeleteShader(VertexShader);
 			if (pathTSControl != null && pathTSEval != null)
 			{
-				GL.DeleteShader(tesselationControlShader);
-				GL.DeleteShader(tesselationEvalShader);
+				GL.DeleteShader(TesselationControlShader);
+				GL.DeleteShader(TesselationEvalShader);
 			}
 			if (pathGS != null)
-				GL.DeleteShader(geometryShader);
+				GL.DeleteShader(GeometryShader);
 			if (pathFS != null)
-				GL.DeleteShader(fragmentShader);
+				GL.DeleteShader(FragmentShader);
 			
 			// Find out what went wrong:			
-            Console.WriteLine(GL.GetProgramInfoLog(shaderProgram));
+            Console.WriteLine(GL.GetProgramInfoLog(ShaderProgram));
 	        
-	        return shaderProgram;
+	        Handle = ShaderProgram;
 	    }
+
+        public void Use()
+        {
+            GL.UseProgram(Handle);
+        }
+
+        public void SetUniform(string name, Matrix4 value)
+        {
+            float[] AsArray = OpenGLHelper.ToFloatArray(value);
+            GL.ProgramUniformMatrix4(Handle, GetUniformIndex(name), 1, false, AsArray);
+        }
+
+        public void SetUniform(string name, Matrix3 value)
+        {
+            float[] AsArray = OpenGLHelper.ToFloatArray(value);
+            GL.ProgramUniformMatrix3(Handle, GetUniformIndex(name), 1, false, AsArray);
+        }
+
+        public void SetUniform(string name, float value)
+        {
+            GL.ProgramUniform1(Handle, GetUniformIndex(name), value);
+        }
+
+        public void SetUniform(string name, Vector2 value)
+        {
+            GL.ProgramUniform2(Handle, GetUniformIndex(name), value.X, value.Y);
+        }
+
+        public void SetUniform(string name, Vector3 value)
+        {
+            GL.ProgramUniform3(Handle, GetUniformIndex(name), value.X, value.Y, value.Z);
+        }
+
+        public void SetUniform(string name, Vector4 value)
+        {
+            GL.ProgramUniform4(Handle, GetUniformIndex(name), value.X, value.Y, value.Z, value.W);
+        }
+
+        public void SetUniform(string name, int x)
+        {
+            GL.ProgramUniform1(Handle, GetUniformIndex(name), x);
+        }
+
+        public void SetUniform(string name, int x, int y)
+        {
+            GL.ProgramUniform2(Handle, GetUniformIndex(name), x, y);
+        }
+
+        public void SetUniform(string name, int x, int y, int z)
+        {
+            GL.ProgramUniform3(Handle, GetUniformIndex(name), x, y, z);
+        }
+
+        public void SetUniform(string name, int x, int y, int z, int w)
+        {
+            GL.ProgramUniform4(Handle, GetUniformIndex(name), x, y, z, w);
+        }
+
+        private int GetUniformIndex(string name)
+        {
+            int Index = GL.GetProgramResourceIndex(Handle, ProgramInterface.Uniform, name);
+            if (Index < 0)
+                Console.WriteLine(name + " does not exist in this GLSL program.");
+
+            return Index;
+        }
 	
 	    private static string GetText(string path)
 	    {
-            string ProgramText = "";
+            string ProgramText;
             using (TextReader Reader = new StreamReader(File.OpenRead(path)))
             {
                 ProgramText = Reader.ReadToEnd();

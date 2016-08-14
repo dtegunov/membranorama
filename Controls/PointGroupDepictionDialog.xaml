@@ -1,0 +1,80 @@
+﻿<m:MetroWindow x:Class="Membranogram.Controls.PointGroupDepictionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Membranogram.Controls"
+        xmlns:m="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:s="clr-namespace:Sparta"
+        mc:Ignorable="d"
+        Title="Point Group Depiction" Height="300" Width="500" BorderThickness="0.5" BorderBrush="{DynamicResource AccentColorBrush}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedTabControl.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Color x:Key="HighlightDarkColor">#FFFFFFFF</Color>
+            <Color x:Key="HighlightLightColor">#FFFFFFFF</Color>
+            <Color x:Key="AccentDarkColor">#FFFFFFFF</Color>
+            <Color x:Key="AccentColor">#FF666666</Color>
+            <Color x:Key="AccentColor2">#FFFFFFFF</Color>
+            <Color x:Key="AccentColor3">#FFFFFFFF</Color>
+            <Color x:Key="AccentColor4">#FF000000</Color>
+            <Color x:Key="LinkColor">CornflowerBlue</Color>
+            <SolidColorBrush x:Key="BrandingBrush" Color="{DynamicResource LinkColor}" />
+            <SolidColorBrush x:Key="AccentColorBrush" Color="{DynamicResource AccentColor}" />
+            <Style TargetType="s:ValueSlider">
+                <Setter Property="Foreground" Value="Black" />
+            </Style>
+            <Style x:Key="HyperlinkLikeButton" TargetType="Button">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <ContentPresenter />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Foreground" Value="#0066cc" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="true">
+                        <Setter Property="Foreground" Value="#3399ff" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <ControlTemplate.Resources>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="TextDecorations" Value="Underline" />
+                                        </Style>
+                                    </ControlTemplate.Resources>
+                                    <ContentPresenter />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <StackPanel Orientation="Vertical" Margin="8">
+        <RadioButton Content="Box" IsChecked="{Binding IsDepictionBox}" Margin="0,3,0,3" />
+        <RadioButton Content="Model" IsChecked="{Binding IsDepictionMesh}" Margin="0,10,0,3" />
+        <StackPanel Orientation="Vertical" Margin="24,0,0,0">
+            <Button Name="ButtonModelPath" Style="{StaticResource HyperlinkLikeButton}" Margin="0,0,0,3" Click="ButtonModelPath_OnClick">
+                <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding DepictionMeshPath}"></TextBlock>
+            </Button>
+            <s:ValueSlider Value="{Binding DepictionMeshLevel, Mode=TwoWay}" UpdateTrigger="PropertyChanged" TextFormat="Surface level: {0}" MinValue="0" MaxValue="9999" StepSize="0.001" Margin="0,0,0,3" />
+            <s:ValueSlider Value="{Binding DepictionMeshOffset, Mode=TwoWay}" UpdateTrigger="PropertyChanged" TextFormat="Offset along Z: {0}" MinValue="-9999" MaxValue="9999" StepSize="0.1" />
+        </StackPanel>
+        <RadioButton Content="Local Isosurface" IsChecked="{Binding IsDepictionLocalSurface}" Margin="0,10,0,3" />
+        <StackPanel Orientation="Vertical" Margin="24,0,0,0">
+            <s:ValueSlider Value="{Binding DepictionLocalSurfaceLevel, Mode=TwoWay}" UpdateTrigger="PropertyChanged" TextFormat="Surface level: {0}" MinValue="0" MaxValue="9999" StepSize="0.001" Margin="0,0,0,3" />
+            <CheckBox IsChecked="{Binding DepictionLocalSurfaceInvert}" Content="Invert contrast" Margin="0,0,0,3" />
+            <CheckBox IsChecked="{Binding DepictionLocalSurfaceOnlyCenter}" Content="Show only central blob" Margin="0,0,0,3" />
+        </StackPanel>
+    </StackPanel>
+</m:MetroWindow>

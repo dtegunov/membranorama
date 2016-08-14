@@ -1,0 +1,117 @@
+﻿<m:MetroWindow x:Class="Membranogram.PatchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:m="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:s="clr-namespace:Sparta"
+        mc:Ignorable="d"
+        Title="{Binding Path=Name}" Height="450" Width="450" SnapsToDevicePixels="True" BorderThickness="0.5" BorderBrush="#FF666666" 
+        WindowTitleBrush="{DynamicResource BrandingBrush}" NonActiveWindowTitleBrush="{DynamicResource BrandingBrush}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedTabControl.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Color x:Key="LinkColor">CornflowerBlue</Color>
+            <SolidColorBrush x:Key="BrandingBrush" Color="{Binding OpaqueColor}" />
+            <Style TargetType="s:ValueSlider">
+                <Setter Property="Foreground" Value="Black" />
+            </Style>
+            <Style x:Key="HyperlinkLikeButton" TargetType="Button">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <ContentPresenter />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="true">
+                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <ControlTemplate.Resources>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="TextDecorations" Value="Underline" />
+                                        </Style>
+                                    </ControlTemplate.Resources>
+                                    <ContentPresenter />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <m:MetroWindow.RightWindowCommands>
+        <m:WindowCommands>
+            <Button Name="ButtonScreenshot" Style="{StaticResource ChromelessButtonStyle}" Margin="10,0" Focusable="False" ToolTip="Make Screenshot" Click="ButtonScreenshot_OnClick">
+                <Canvas Width="16" Height="16">
+                    <Path Width="16" Height="16" Stretch="Uniform" Data="M13.73,15L9.83,21.76C10.53,21.91 11.25,22 12,22C14.4,22 16.6,21.15 18.32,19.75L14.66,13.4M2.46,15C3.38,17.92 5.61,20.26 8.45,21.34L12.12,15M8.54,12L4.64,5.25C3,7 2,9.39 2,12C2,12.68 2.07,13.35 2.2,14H9.69M21.8,10H14.31L14.6,10.5L19.36,18.75C21,16.97 22,14.6 22,12C22,11.31 21.93,10.64 21.8,10M21.54,9C20.62,6.07 18.39,3.74 15.55,2.66L11.88,9M9.4,10.5L14.17,2.24C13.47,2.09 12.75,2 12,2C9.6,2 7.4,2.84 5.68,4.25L9.34,10.6L9.4,10.5Z" Fill="Black" />
+                </Canvas>
+            </Button>
+        </m:WindowCommands>
+    </m:MetroWindow.RightWindowCommands>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="10" />
+            <RowDefinition Name="RowControls" Height="135" />
+        </Grid.RowDefinitions>
+        <WindowsFormsHost Name="ViewportHost" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,0" Initialized="ViewportHost_Initialized" />
+        <Button Grid.Row="1" Name="ButtonHideControls" Style="{StaticResource ChromelessButtonStyle}" Click="ButtonHideControls_OnClick">
+            <Canvas Width="10" Height="8">
+                <Path Width="10" Height="8" Stretch="Uniform" Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" Fill="Black" />
+            </Canvas>
+        </Button>
+        <Button Grid.Row="1" Name="ButtonShowControls" Visibility="Collapsed" Style="{StaticResource ChromelessButtonStyle}" Click="ButtonShowControls_OnClick">
+            <Canvas Width="10" Height="8">
+                <Path Width="10" Height="8" Stretch="Uniform" Data="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" Fill="Black" />
+            </Canvas>
+        </Button>
+        <StackPanel Grid.Row="2" Orientation="Vertical" Margin="6,4,6,0">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding Path=IsLocked}" Content="Lock to " VerticalAlignment="Center" />
+                <ComboBox ItemsSource="{Binding Path=DisplayedPatches}"
+                          DisplayMemberPath="Name"
+                          SelectedValue="{Binding Path=LockTarget}"
+                          Width="100" Background="White"/>
+                <CheckBox Content="Camera" IsChecked="{Binding IsLockedCamera}" VerticalAlignment="Center" Margin="10,0,0,0" />
+                <CheckBox IsChecked="{Binding IsLockedPosition}" VerticalAlignment="Center" Margin="6,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Position " />
+                        <TextBlock Name="TextRMSD" />
+                    </StackPanel>
+                </CheckBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                <s:ValueSlider Value="{Binding Path=SurfaceOffset, Mode=TwoWay}" TextFormat="Offset surface by {0} px. " MinValue="-1000" MaxValue="1000" StepSize="0.25" UpdateTrigger="PropertyChanged" />
+                <s:ValueSlider Value="{Binding Path=TraceDepth, Mode=TwoWay}" TextFormat="{}{0} px thick shell, " MinValue="0" MaxValue="1000" UpdateTrigger="PropertyChanged" />
+                <s:ValueSlider Value="{Binding Path=TraceDepthOffset, Mode=TwoWay}" TextFormat="offset by {0} px. " MinValue="-1000" MaxValue="1000" UpdateTrigger="PropertyChanged" />
+                <s:ValueSlider Value="{Binding Path=TraceSharpening, Mode=TwoWay}" TextFormat="Apply {0} % sharpening." MinValue="0" MaxValue="300" StepSize="10" UpdateTrigger="PropertyChanged" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                <s:ValueSlider Value="{Binding Path=OutputRangeMin, Mode=TwoWay}" TextFormat="Normalize image within {0}—" MinValue="-3" MaxValue="2.99" StepSize="0.01" UpdateTrigger="PropertyChanged" />
+                <s:ValueSlider Value="{Binding Path=OutputRangeMax, Mode=TwoWay}" TextFormat="{}{0}." MinValue="-2.99" MaxValue="3" StepSize="0.01" UpdateTrigger="PropertyChanged" />
+                <s:ValueSlider Value="{Binding Path=Viewport.Camera.AngstromPerPixel, Mode=TwoWay}" TextFormat=" Zoom to {0} Å/px. " MinValue="0.01" MaxValue="1000000" StepSize="0.01" UpdateTrigger="PropertyChanged" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                <Button Name="ButtonPlanarization" Content="START PLANARIZATION" FontWeight="Medium" VerticalAlignment="Center" Style="{StaticResource ChromelessButtonStyle}" Click="ButtonPlanarization_OnClick" />
+                <s:ValueSlider Value="{Binding Path=ShapePreservation, Mode=TwoWay}" TextFormat="Shape preservation factor: {0}." MinValue="1" MaxValue="100" StepSize="0.1" VerticalAlignment="Center" Margin="16,0,0,0" UpdateTrigger="PropertyChanged" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                <s:FormattedTextBlock TextFormat="Ca. {0:0.0} ° between face normals and camera." Value="{Binding MeanFaceAngle}" VerticalAlignment="Center" />
+                <s:FormattedTextBlock TextFormat=" Edge lengths are off by {0:0.0} %." Value="{Binding MeanEdgeError}" VerticalAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</m:MetroWindow>

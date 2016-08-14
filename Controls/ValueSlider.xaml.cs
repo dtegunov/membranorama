@@ -30,11 +30,11 @@ namespace Sparta
             set { SetValue(ValueProperty, value); }
         }
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(decimal), typeof(ValueSlider), new UIPropertyMetadata(-1m, new PropertyChangedCallback((sender, e) =>
-        {
-            ValueSlider Sender = (ValueSlider)sender;
-            Sender.TempValue = (decimal)e.NewValue;
-        })));
+            DependencyProperty.Register("Value", typeof(decimal), typeof(ValueSlider), new UIPropertyMetadata(-1m, (sender, e) =>
+            {
+                ValueSlider Sender = (ValueSlider)sender;
+                Sender.TempValue = (decimal)e.NewValue;
+            }));
 
         public int Decimals
         {
@@ -50,7 +50,7 @@ namespace Sparta
             set { SetValue(StringValueProperty, value); }
         }
         public static readonly DependencyProperty StringValueProperty =
-            DependencyProperty.Register("StringValue", typeof(string), typeof(ValueSlider), new PropertyMetadata("", new PropertyChangedCallback(StringValueChanged)));
+            DependencyProperty.Register("StringValue", typeof(string), typeof(ValueSlider), new PropertyMetadata("", StringValueChanged));
         private static void StringValueChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             ValueSlider Sender = (ValueSlider)sender;
@@ -64,7 +64,7 @@ namespace Sparta
                 }
                 catch
                 { }
-                Sender.StringValue = String.Format(Sender.Format, Sender.TempValue * Sender.DisplayMultiplicator);
+                Sender.StringValue = string.Format(Sender.Format, Sender.TempValue * Sender.DisplayMultiplicator);
             }
         }
 
@@ -81,13 +81,14 @@ namespace Sparta
             get { return (decimal)GetValue(TempValueProperty); }
             set { SetValue(TempValueProperty, value); }
         }
+
         public static readonly DependencyProperty TempValueProperty =
-            DependencyProperty.Register("TempValue", typeof(decimal), typeof(ValueSlider), new UIPropertyMetadata(-1m, new PropertyChangedCallback(TempValueChanged)));
-        private static void TempValueChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            ValueSlider Sender = (ValueSlider)sender;
-            Sender.StringValue = String.Format(Sender.Format, Sender.TempValue * Sender.DisplayMultiplicator);
-        }
+            DependencyProperty.Register("TempValue", typeof(decimal), typeof(ValueSlider),
+                new UIPropertyMetadata(-1m, (sender, e) =>
+                {
+                    ValueSlider Sender = (ValueSlider)sender;
+                    Sender.StringValue = string.Format(Sender.Format, Sender.TempValue * Sender.DisplayMultiplicator);
+                }));
 
         public decimal StepSize
         {
@@ -95,7 +96,7 @@ namespace Sparta
             set { SetValue(StepSizeProperty, value); }
         }
         public static readonly DependencyProperty StepSizeProperty =
-            DependencyProperty.Register("StepSize", typeof(decimal), typeof(ValueSlider), new UIPropertyMetadata(1m, new PropertyChangedCallback(StepSizeChanged)));
+            DependencyProperty.Register("StepSize", typeof(decimal), typeof(ValueSlider), new UIPropertyMetadata(1m, StepSizeChanged));
         private static void StepSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             ValueSlider Sender = (ValueSlider)sender;
@@ -129,13 +130,13 @@ namespace Sparta
             set { SetValue(MinValueProperty, value); }
         }
         public static readonly DependencyProperty MinValueProperty =
-            DependencyProperty.Register("MinValue", typeof(decimal), typeof(ValueSlider), new UIPropertyMetadata(0m, new PropertyChangedCallback(MinValueChanged)));
-        static void MinValueChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            ValueSlider Sender = (ValueSlider)sender;
-            if (Sender.Value < (decimal)e.NewValue)
-                Sender.Value = (decimal)e.NewValue;
-        }
+            DependencyProperty.Register("MinValue", typeof(decimal), typeof(ValueSlider),
+                new UIPropertyMetadata(0m, (sender, e) =>
+                {
+                    ValueSlider Sender = (ValueSlider)sender;
+                    if (Sender.Value < (decimal)e.NewValue)
+                        Sender.Value = (decimal)e.NewValue;
+                }));
 
         public decimal MaxValue
         {
@@ -143,13 +144,13 @@ namespace Sparta
             set { SetValue(MaxValueProperty, value); }
         }
         public static readonly DependencyProperty MaxValueProperty =
-            DependencyProperty.Register("MaxValue", typeof(decimal), typeof(ValueSlider), new UIPropertyMetadata(100m, new PropertyChangedCallback(MaxValueChanged)));
-        static void MaxValueChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            ValueSlider Sender = (ValueSlider)sender;
-            if (Sender.Value > (decimal)e.NewValue)
-                Sender.Value = (decimal)e.NewValue;
-        }
+            DependencyProperty.Register("MaxValue", typeof(decimal), typeof(ValueSlider),
+                new UIPropertyMetadata(100m, (sender, e) =>
+                {
+                    ValueSlider Sender = (ValueSlider)sender;
+                    if (Sender.Value > (decimal)e.NewValue)
+                        Sender.Value = (decimal)e.NewValue;
+                }));
 
         public bool IsExponential
         {
@@ -166,21 +167,21 @@ namespace Sparta
         }
         public static readonly DependencyProperty ExponentialBaseProperty =
             DependencyProperty.Register("ExponentialBase", typeof(decimal), typeof(ValueSlider), new UIPropertyMetadata(2m));
-        
+
         public decimal DisplayMultiplicator
         {
             get { return (decimal)GetValue(DisplayMultiplicatorProperty); }
             set { SetValue(DisplayMultiplicatorProperty, value); }
         }
         public static readonly DependencyProperty DisplayMultiplicatorProperty =
-            DependencyProperty.Register("DisplayMultiplicator", typeof(decimal), typeof(ValueSlider), new PropertyMetadata(1.0m, new PropertyChangedCallback(DisplayMultiplicatorChanged)));
-        private static void DisplayMultiplicatorChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            ValueSlider Sender = (ValueSlider)sender;
-            Sender.StringValue = String.Format(Sender.Format, Sender.TempValue * Sender.DisplayMultiplicator);
-            StepSizeChanged(sender, e);
-        }
-        
+            DependencyProperty.Register("DisplayMultiplicator", typeof(decimal), typeof(ValueSlider),
+                new PropertyMetadata(1.0m, (sender, e) =>
+                {
+                    ValueSlider Sender = (ValueSlider)sender;
+                    Sender.StringValue = String.Format(Sender.Format, Sender.TempValue * Sender.DisplayMultiplicator);
+                    StepSizeChanged(sender, e);
+                }));
+
         public UpdateSourceTrigger UpdateTrigger
         {
             get { return (UpdateSourceTrigger)GetValue(UpdateTriggerProperty); }
@@ -210,14 +211,12 @@ namespace Sparta
 
         public void OnPreviewValueChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            if (PreviewValueChanged != null)
-                PreviewValueChanged(sender, e);
+            PreviewValueChanged?.Invoke(sender, e);
         }
 
         public void OnValueChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            if (ValueChanged != null)
-                ValueChanged(sender, e);
+            ValueChanged?.Invoke(sender, e);
         }
 
         private void ValueBlock_MouseDown(object sender, MouseButtonEventArgs e)
@@ -250,18 +249,23 @@ namespace Sparta
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            FrameworkElement RootParent = (FrameworkElement)this.Parent;
-            while (RootParent.Parent != null)
-                RootParent = (FrameworkElement)RootParent.Parent;
-
-            try
+            if (Parent != null)
             {
-                Window RootWindow = (Window)RootParent;
-                RootWindow.PreviewMouseMove += new MouseEventHandler(Window_PreviewMouseMove);
-                RootWindow.PreviewMouseUp += new MouseButtonEventHandler(Window_PreviewMouseUp);
+                FrameworkElement RootParent = (FrameworkElement)Parent;
+                while (RootParent.Parent != null)
+                    RootParent = (FrameworkElement)RootParent.Parent;
+
+                try
+                {
+                    Window RootWindow = (Window)RootParent;
+                    RootWindow.PreviewMouseMove += Window_PreviewMouseMove;
+                    RootWindow.PreviewMouseUp += Window_PreviewMouseUp;
+                }
+                catch
+                {
+                    // ignored
+                }
             }
-            catch
-            { }
         }
 
         void Window_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -326,6 +330,42 @@ namespace Sparta
         void Window_PreviewDragEnter(object sender, DragEventArgs e)
         {
             e.Handled = true;
+        }
+
+        private void EditPanel_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            e.Handled = true;
+
+            if (IsDragging)
+                return;
+
+            OldValue = Value;
+            OldStepSize = StepSize;
+            DeltaY = 0;
+
+            int DeltaSteps = Math.Sign(e.Delta);
+            decimal DeltaValue = DeltaSteps * StepSize;
+            if (!IsExponential)
+                TempValue = Math.Min(Math.Max(OldValue + DeltaValue, MinValue), MaxValue);
+            else
+            {
+                decimal OldExponent = OldValue >= 1m ? (decimal)Math.Log((double)OldValue, (double)ExponentialBase) : -1m;
+                decimal NewExponent = (decimal)Math.Min(Math.Max(((double)OldExponent + (double)DeltaValue), -1), Math.Log((double)MaxValue, (double)ExponentialBase));
+                if (NewExponent >= 0m)
+                    TempValue = (decimal)Math.Max(Math.Pow((double)ExponentialBase, (double)NewExponent), (double)MinValue);
+                else
+                    TempValue = (decimal)Math.Max(0m, MinValue);
+            }
+
+            TempValue = Math.Round(TempValue, Decimals + 1);
+            if (UpdateTrigger == UpdateSourceTrigger.PropertyChanged)
+            {
+                OnPreviewValueChanged(this, new DependencyPropertyChangedEventArgs(ValueProperty, OldValue, TempValue));
+                Value = TempValue;
+                OnValueChanged(this, new DependencyPropertyChangedEventArgs(ValueProperty, OldValue, Value));
+            }
+
+            ValueBlock_MouseUp(null, null);
         }
     }
 }

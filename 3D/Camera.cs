@@ -20,9 +20,12 @@ namespace Membranogram
         private float _Distance = 1;
         public float Distance
         {
-            get { return _Distance; }
+            get { return IsOrthogonal ? 1e4f : _Distance; }
             set { if (value != _Distance) { _Distance = value; OnPropertyChanged(); } }
         }
+
+        public float ClipNear = 1e-1f;
+        public float ClipFar = 1e6f;
 
         private Quaternion _Rotation = Quaternion.Identity;
         public Quaternion Rotation
@@ -42,7 +45,43 @@ namespace Membranogram
         public int2 ViewportSize
         {
             get { return _ViewportSize; }
-            set { if (value != _ViewportSize) { _ViewportSize = value; OnPropertyChanged(); } }
+            set { if (value != _ViewportSize) { _ViewportSize = value; OnPropertyChanged(); OnPropertyChanged("AngstromPerPixel"); } }
+        }
+
+        private bool _IsOrthogonal = false;
+        public bool IsOrthogonal
+        {
+            get { return _IsOrthogonal; }
+            set { if (value != _IsOrthogonal) { _IsOrthogonal = value; OnPropertyChanged(); } }
+        }
+
+        private float _OrthogonalSize = 1f;
+        public float OrthogonalSize
+        {
+            get { return _OrthogonalSize; }
+            set { if (value != _OrthogonalSize) { _OrthogonalSize = value; OnPropertyChanged(); OnPropertyChanged("AngstromPerPixel"); } }
+        }
+        
+        public float AngstromPerPixel
+        {
+            get
+            {
+                Vector3 Angstrom = Target + GetPlanarX();
+                Angstrom = Vector3.Transform(Angstrom, GetViewProj());
+                float PixelsPerAngstrom = Angstrom.X / 2f * ViewportSize.X;
+
+                return 1f / PixelsPerAngstrom;
+            }
+            set
+            {
+                if (value < 0.01f)
+                    return;
+                if (value != AngstromPerPixel)
+                {
+                    float Change = value / AngstromPerPixel;
+                    OrthogonalSize *= Change;
+                }
+            }
         }
 
         public Camera()
@@ -62,7 +101,10 @@ namespace Membranogram
 
         public Matrix4 GetProj()
         {
-            return Matrix4.CreatePerspectiveFieldOfView((float)FOV, (float)ViewportSize.X / (float)ViewportSize.Y, 1e-1f, 1e6f);
+            if (!IsOrthogonal)
+                return Matrix4.CreatePerspectiveFieldOfView((float) FOV, (float) ViewportSize.X / (float) ViewportSize.Y, ClipNear, ClipFar);
+            else
+                return Matrix4.CreateOrthographic(OrthogonalSize, OrthogonalSize * ViewportSize.Y / ViewportSize.X, ClipNear, ClipFar);
         }
 
         public float[] GetProjAsArray()
@@ -118,7 +160,15 @@ namespace Membranogram
             Quaternion NewRotation = Rotation * RotateBy;
             NewRotation.Normalize();
             Rotation = NewRotation;
-            Console.WriteLine(Rotation);
+        }
+
+        public void Roll(float angle)
+        {
+            Vector3 Axis = GetDirection();
+            Quaternion RotateBy = Quaternion.FromAxisAngle(Axis, angle);
+            Quaternion NewRotation = Rotation * RotateBy;
+            NewRotation.Normalize();
+            Rotation = NewRotation;
         }
 
         public void Move(Vector3 delta)
@@ -148,14 +198,17 @@ namespace Membranogram
             Vector3 MeshMin = model.GetMin();
             Vector3 MeshMax = model.GetMax();
             Vector3 MeshCenter = (MeshMin + MeshMax) / 2f;
-            float MaxExtent = Math.Max(Math.Max(MeshMax.X - MeshMin.X, MeshMax.Y - MeshMin.Y), MeshMax.Z - MeshMin.Z);
             Move(MeshCenter - Target);
-            Distance = MaxExtent * 1.5f;
+            float MaxExtent = Math.Max(Math.Max(MeshMax.X - MeshMin.X, MeshMax.Y - MeshMin.Y), MeshMax.Z - MeshMin.Z);
+            if (!IsOrthogonal)
+                Distance = MaxExtent * 1.5f;
+            else
+                OrthogonalSize = MaxExtent;
         }
 
         public Ray3 GetRayThroughPixel(Vector2 pixel)
         {
-            pixel.X = pixel.X - ViewportSize.X * 0.5f;		// Window origin is upper left corner, OGL is bottom right, so flip
+            pixel.X = pixel.X - ViewportSize.X * 0.5f;		// Window origin is upper left corner, OGL is bottom right (left handed, Y = up), so flip
             pixel.Y = ViewportSize.Y - pixel.Y - ViewportSize.Y * 0.5f;
             Vector3 PlanarX = GetPlanarX(), PlanarY = GetPlanarY();
 

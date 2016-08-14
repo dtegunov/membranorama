@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              x:Name="MainControl"
-             FontSize="20"
+             FontSize="12"
              Cursor="IBeam"
              Focusable="True"
              MouseLeftButtonDown="UserControl_MouseDown">
