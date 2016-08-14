@@ -5,23 +5,23 @@
 
 
 ## You will need
--Windows PC with a good GPU, the latest drivers and .NET Framework 4.6 installed.
--Tomographic volume in MRC format, preferably generated in IMOD; it has to be small enough to fit into your GPU memory (a 4k tomogram probably won't fit).
--Segmentation surface in OBJ format, exported from a tool like FEI's Amira.
+- Windows PC with a good GPU, the latest drivers and [.NET Framework 4.6](https://www.microsoft.com/en-us/download/details.aspx?id=48130) installed.
+- Tomographic volume in MRC format, preferably generated in IMOD; it has to be small enough to fit into your GPU memory (a 4k tomogram probably won't fit).
+- Segmentation surface in OBJ format, exported from a tool like FEI's Amira.
 
 
 ## Getting started
 
-Compile Membranorama in Visual Studio 2015 or newer; or use Membranogram.exe from this repository's /bin/Release folder.
+Use Membranogram.exe from this repository's /bin/Release folder, or compile it yourself using [Visual Studio 2015](https://www.visualstudio.com/en-us/visual-studio-homepage-vs.aspx) or newer.
 
 Use the buttons under "Files" to load the tomogram and surface files. You can use the session buttons later to save or load the entire session, uncluding all analysis data.
 
 If everything went fine, you should see your membrane surface with the tomogram projected onto it. If the surface stays blank, the most likely cause is an incorrect offset value in the MRC header. Make sure to use the same file you used for segmentation in Amira, or copy its offset into the header of the file you want to load (e. g. binned version).
 
 Navigate the membranogram:
--Click and drag to rotate
--Scroll to zoom
--Mouse wheel click and drag to pan
+- Click and drag to rotate
+- Scroll to zoom
+- Mouse wheel click and drag to pan
 
 The initial intensity range and lighting may not be what you want. Adjust them using the parameters under "Display". If the membranogram is too blurry, adjust the sharpening under "Tracing" (this will cost you some GPU resources).
 
@@ -46,24 +46,24 @@ Points will be added to the currently selected point group. Select a different g
 If you have multiple point groups, you can move points between them by selecting the points, right-clicking the list, and selecting the name of the group you want to move them to.
 
 Points can be exported to a tab-delimited text file:
--PositionXYZ: Coordinates in Angstrom, including the offset from the MRC header
--VolumeXYZ: Coordinates in pixels within the tomogram
--Offset: Offset from the original surface
--mXX: Fields of a 3x3 matrix describing the point's rotation, with the Z axis being the surface normal
+- PositionXYZ: Coordinates in Angstrom, including the offset from the MRC header
+- VolumeXYZ: Coordinates in pixels within the tomogram
+- Offset: Offset from the original surface
+- mXX: Fields of a 3x3 matrix describing the point's rotation, with the Z axis being the surface normal
 
 Similarly, points can be imported from tab-delimited text files with the same field order, or from other Membranorama sessions.
 
 Point groups have several properties to help with the analysis:
--Name: Click it to start editing, confirm the edit by pressing Enter.
--Size: The box size in tomogram pixels.
--Color: The default is to have slightly transparent colors, but you can make them opaque by changing the alpha channel value.
--N: Number of points in the group.
--Visibility: Show/hide all points in a group.
+- Name: Click it to start editing, confirm the edit by pressing Enter.
+- Size: The box size in tomogram pixels.
+- Color: The default is to have slightly transparent colors, but you can make them opaque by changing the alpha channel value.
+- N: Number of points in the group.
+- Visibility: Show/hide all points in a group.
 
 Point group depiction:
--Box: Default, cube with an orientation stick.
--Model: You can load either an OBJ mesh, e. g. exported from UCSF Chimera; or let Membranorama create an isosurface from an MRC volume, e. g. a protein density refined in Relion.
--Local isosurface: Makes each point shape unique, representing the isosurface of the sub-tomogram within it. Use it to locally sample the density landscape around the points.
+- Box: Default, cube with an orientation stick.
+- Model: You can load either an OBJ mesh, e. g. exported from UCSF Chimera; or let Membranorama create an isosurface from an MRC volume, e. g. a protein density refined in Relion.
+- Local isosurface: Makes each point shape unique, representing the isosurface of the sub-tomogram within it. Use it to locally sample the density landscape around the points.
 
 
 
