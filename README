@@ -10,6 +10,8 @@ You will need:
 
 Get started:
 
+Compile Membranorama, or use Membranogram.exe from this repository's /bin/Release folder.
+
 Use the buttons under "Files" to load the tomogram and surface files. You can use the session buttons later to save or load the entire session, uncluding all analysis data.
 
 If everything went fine, you should see your membrane surface with the tomogram projected onto it. If the surface stays blank, the most likely cause is an incorrect offset value in the MRC header. Make sure to use the same file you used for segmentation in Amira, or copy its offset into the header of the file you want to load (e. g. binned version).
