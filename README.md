@@ -6,8 +6,8 @@
 
 ## You will need
 - Windows PC with a good GPU, the latest drivers and [.NET Framework 4.6](https://www.microsoft.com/en-us/download/details.aspx?id=48130) installed.
-- Tomographic volume in MRC format, preferably generated in IMOD; it has to be small enough to fit into your GPU memory (a 4k tomogram probably won't fit).
-- Segmentation surface in OBJ format, exported from a tool like FEI's Amira.
+- Tomographic volume in MRC format, preferably generated in [IMOD](http://bio3d.colorado.edu/imod/); it has to be small enough to fit into your GPU memory (a 4k tomogram probably won't fit).
+- Segmentation surface in OBJ format, exported from a tool like [FEI's Amira](https://www.fei.com/software/amira-3d-for-life-sciences/).
 
 
 ## Getting started
@@ -62,7 +62,7 @@ Point groups have several properties to help with the analysis:
 
 Point group depiction:
 - Box: Default, cube with an orientation stick.
-- Model: You can load either an OBJ mesh, e. g. exported from UCSF Chimera; or let Membranorama create an isosurface from an MRC volume, e. g. a protein density refined in Relion.
+- Model: You can load either an OBJ mesh, e. g. exported from [UCSF Chimera](https://www.cgl.ucsf.edu/chimera/); or let Membranorama create an isosurface from an MRC volume, e. g. a protein density refined in [Relion](http://www2.mrc-lmb.cam.ac.uk/relion/index.php/Main_Page).
 - Local isosurface: Makes each point shape unique, representing the isosurface of the sub-tomogram within it. Use it to locally sample the density landscape around the points.
 
 
