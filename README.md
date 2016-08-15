@@ -95,3 +95,9 @@ It is often useful to have **multiple patches in the same reference frame**, e. 
 ## Bonus
 
 Take **screenshots** using the aperture button in the window frame next to minimize.
+
+
+
+## Authorship
+
+Membranorama is being developed by Dimitry Tegunov ([tegunov@gmail.com](mailto:tegunov@gmail.com), currently in Patrick Cramer's lab at the Max Planck Institute for Biophysical Chemistry in Göttingen, Germany.
