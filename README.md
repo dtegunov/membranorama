@@ -100,4 +100,4 @@ Take **screenshots** using the aperture button in the window frame next to minim
 
 ## Authorship
 
-Membranorama is being developed by Dimitry Tegunov ([tegunov@gmail.com](mailto:tegunov@gmail.com), currently in Patrick Cramer's lab at the Max Planck Institute for Biophysical Chemistry in Göttingen, Germany.
+Membranorama is being developed by Dimitry Tegunov ([tegunov@gmail.com](mailto:tegunov@gmail.com)), currently in Patrick Cramer's lab at the Max Planck Institute for Biophysical Chemistry in Göttingen, Germany.
