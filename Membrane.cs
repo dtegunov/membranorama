@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
+using Warp;
+using Membranogram.Helpers;
 
 namespace Membranogram
 {
@@ -198,7 +200,7 @@ namespace Membranogram
 
             PointGroups.CollectionChanged += PointGroups_CollectionChanged;
 
-            ActiveGroup = new PointGroup { Color = Helper.SpectrumColor(0, 0.3f), Name = "Default Group", Size = 10 };
+            ActiveGroup = new PointGroup { Color = ColorHelper.SpectrumColor(0, 0.3f), Name = "Default Group", Size = 10 };
             PointGroups.Add(ActiveGroup);
 
             Patches.CollectionChanged += Patches_CollectionChanged;
@@ -388,9 +390,9 @@ namespace Membranogram
                 if (TomogramTexture != null)
                 {
                     MeshProgram.SetUniform("useVolume", 1f);
-                    MeshProgram.SetUniform("volScale", Helper.Reciprocal(TomogramTexture.Scale));
+                    MeshProgram.SetUniform("volScale", OpenGLHelper.Reciprocal(TomogramTexture.Scale));
                     MeshProgram.SetUniform("volOffset", TomogramTexture.Offset);
-                    MeshProgram.SetUniform("texSize", Helper.Reciprocal(TomogramTexture.Size));
+                    MeshProgram.SetUniform("texSize", OpenGLHelper.Reciprocal(TomogramTexture.Size));
 
                     GL.ActiveTexture(TextureUnit.Texture0);
                     GL.BindTexture(TextureTarget.Texture3D, TomogramTexture.Handle);
@@ -456,7 +458,7 @@ namespace Membranogram
                     else if (group.Depiction == PointDepiction.Mesh)
                     {
                         PointModelProgram.Use();
-                        PointModelProgram.SetUniform("modelColor", Helper.ColorToVector(group.Color, true));
+                        PointModelProgram.SetUniform("modelColor", ColorHelper.ColorToVector(group.Color, true));
                         PointModelProgram.SetUniform("cameraDirection", Viewport.Camera.GetDirection());
 
                         foreach (var point in group.Points)
@@ -472,7 +474,7 @@ namespace Membranogram
                     else if (group.Depiction == PointDepiction.LocalSurface)
                     {
                         PointModelProgram.Use();
-                        PointModelProgram.SetUniform("modelColor", Helper.ColorToVector(group.Color, true));
+                        PointModelProgram.SetUniform("modelColor", ColorHelper.ColorToVector(group.Color, true));
                         PointModelProgram.SetUniform("cameraDirection", Viewport.Camera.GetDirection());
 
                         foreach (var point in group.Points)
@@ -485,7 +487,7 @@ namespace Membranogram
                         }
 
                         // Also draw the orientation stick
-                        if (Helper.CtrlDown())
+                        if (KeyboardHelper.CtrlDown())
                         {
                             PointGizmoProgram.Use();
                             PointGizmoProgram.SetUniform("worldViewProjMatrix", MainWindow.Options.Viewport.Camera.GetViewProj());

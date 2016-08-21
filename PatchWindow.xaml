@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:m="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        xmlns:s="clr-namespace:Sparta"
+        xmlns:s="clr-namespace:Sparta;assembly=WarpLib"
         mc:Ignorable="d"
         Title="{Binding Path=Name}" Height="450" Width="450" SnapsToDevicePixels="True" BorderThickness="0.5" BorderBrush="#FF666666" 
         WindowTitleBrush="{DynamicResource BrandingBrush}" NonActiveWindowTitleBrush="{DynamicResource BrandingBrush}">

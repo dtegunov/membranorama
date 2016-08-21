@@ -15,6 +15,7 @@ using Membranogram.Controls;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using Warp.Tools;
+using Membranogram.Helpers;
 
 namespace Membranogram
 {
@@ -137,18 +138,18 @@ namespace Membranogram
 
                 if (PickedTriangle != null && e.Button == System.Windows.Forms.MouseButtons.Left)   // Extent triangle selection
                 {
-                    if (Helper.ShiftDown() && !Helper.AltDown())
+                    if (KeyboardHelper.ShiftDown() && !KeyboardHelper.AltDown())
                     {
                         sender.SelectTriangles(new[] { PickedTriangle });
                         RedrawNeeded = true;
                     }
-                    else if (Helper.AltDown() && !Helper.ShiftDown())
+                    else if (KeyboardHelper.AltDown() && !KeyboardHelper.ShiftDown())
                     {
                         sender.DeselectTriangles(new[] { PickedTriangle });
                         RedrawNeeded = true;
                     }
                 }
-                else if (Helper.CtrlDown() && !IsPointForemost && !Helper.ShiftDown() && !Helper.AltDown())     // Show surface point preview
+                else if (KeyboardHelper.CtrlDown() && !IsPointForemost && !KeyboardHelper.ShiftDown() && !KeyboardHelper.AltDown())     // Show surface point preview
                 {
                     sender.PreviewGroup.CopyPropertiesFrom(sender.ActiveGroup);
 
@@ -168,10 +169,10 @@ namespace Membranogram
                         float PsiDiff = 0;
                         if (sender.PreviewGroup.Points.Count == 1)
                         {
-                            Matrix3 OldFrame = sender.PreviewGroup.Points[0].TransformedMatrix;
-                            Matrix3 NewFrame = PickedTriangle.GetPlaneMatrix3();
+                            OpenTK.Matrix3 OldFrame = sender.PreviewGroup.Points[0].TransformedMatrix;
+                            OpenTK.Matrix3 NewFrame = PickedTriangle.GetPlaneMatrix3();
 
-                            Matrix3 DiffFrame = Matrix3.Transpose(OldFrame) * NewFrame;
+                            OpenTK.Matrix3 DiffFrame = OpenTK.Matrix3.Transpose(OldFrame) * NewFrame;
                             PsiDiff = (float)Math.Atan2(DiffFrame.Column0.Y, DiffFrame.Column0.X);
                         }
 
@@ -189,7 +190,7 @@ namespace Membranogram
                         RedrawNeeded = true;
                     }
                 }
-                else if (!Helper.CtrlDown() || IsPointForemost)     // Hide surface point preview
+                else if (!KeyboardHelper.CtrlDown() || IsPointForemost)     // Hide surface point preview
                 {
                     if (Options.Membrane.PreviewGroup.Points.Count == 1)
                     {
@@ -200,7 +201,7 @@ namespace Membranogram
                         throw new Exception("Preview group has more than 1 point, but it really should not.");
                 }
 
-                if (Helper.CtrlDown() && DraggingPoint != null && TriangleIntersections.Any())
+                if (KeyboardHelper.CtrlDown() && DraggingPoint != null && TriangleIntersections.Any())
                 {
                     Vector3 PointPosition = Position;
                     if (DraggingPoint.Group.Depiction == PointDepiction.LocalSurface && sender.TomogramTexture != null)
@@ -213,10 +214,10 @@ namespace Membranogram
                     }
 
                     float PsiDiff = 0;
-                    Matrix3 OldFrame = DraggingPoint.TransformedMatrix;
-                    Matrix3 NewFrame = PickedTriangle.GetPlaneMatrix3();
+                    OpenTK.Matrix3 OldFrame = DraggingPoint.TransformedMatrix;
+                    OpenTK.Matrix3 NewFrame = PickedTriangle.GetPlaneMatrix3();
 
-                    Matrix3 DiffFrame = Matrix3.Transpose(OldFrame) * NewFrame;
+                    OpenTK.Matrix3 DiffFrame = OpenTK.Matrix3.Transpose(OldFrame) * NewFrame;
                     PsiDiff = (float)Math.Atan2(DiffFrame.Column0.Y, DiffFrame.Column0.X);
 
                     float Offset = (float)sender.SurfaceOffset * Options.PixelScale.X;
@@ -250,21 +251,21 @@ namespace Membranogram
 
             bool IsPointForemost = PointIntersections.Count() > 0 ? PointIntersections.First() == intersections.First() : false;
 
-            if (Helper.ShiftDown() || Helper.AltDown() || Helper.CtrlDown())
+            if (KeyboardHelper.ShiftDown() || KeyboardHelper.AltDown() || KeyboardHelper.CtrlDown())
             {
                 if (TriangleIntersections.Count() > 0 && !IsPointForemost)
                 {
                     Triangle ClickedTriangle = (Triangle)TriangleIntersections.First().Target;
 
-                    if (Helper.ShiftDown() && !Helper.AltDown() && !Helper.CtrlDown()) // Select triangles
+                    if (KeyboardHelper.ShiftDown() && !KeyboardHelper.AltDown() && !KeyboardHelper.CtrlDown()) // Select triangles
                     {
                         sender.SelectTriangles(new[] { ClickedTriangle });
                     }
-                    else if (Helper.AltDown() && !Helper.ShiftDown() && !Helper.CtrlDown()) // Deselect triangles
+                    else if (KeyboardHelper.AltDown() && !KeyboardHelper.ShiftDown() && !KeyboardHelper.CtrlDown()) // Deselect triangles
                     {
                         sender.DeselectTriangles(new[] { ClickedTriangle });
                     }
-                    else if (Helper.CtrlDown() && !Helper.ShiftDown() && !Helper.AltDown()) // Create a surface point
+                    else if (KeyboardHelper.CtrlDown() && !KeyboardHelper.ShiftDown() && !KeyboardHelper.AltDown()) // Create a surface point
                     {
                         if (sender.PreviewGroup.Points.Count == 1)  // If there is already a preview point, keep it for its possibly non-default Psi
                         {
@@ -297,7 +298,7 @@ namespace Membranogram
 
             bool IsPointForemost = PointIntersections.Count() > 0 ? PointIntersections.First() == intersections.First() : false;
 
-            if (IsPointForemost && Helper.CtrlDown())
+            if (IsPointForemost && KeyboardHelper.CtrlDown())
                 DraggingPoint = (SurfacePoint)PointIntersections.First().Target;
         }
 
@@ -320,18 +321,18 @@ namespace Membranogram
 
             bool RedrawNeeded = false;
 
-            if (Helper.CtrlDown() && IsPointForemost)   // Rotate closest point overlapping with cursor
+            if (KeyboardHelper.CtrlDown() && IsPointForemost)   // Rotate closest point overlapping with cursor
             {
-                float Mult = Helper.ShiftDown() ? 30f : 3f;
+                float Mult = KeyboardHelper.ShiftDown() ? 30f : 3f;
                 ((SurfacePoint)PointIntersections.First().Target).Psi -= e.Delta / 120f * Mult / 180f * (float)Math.PI;
                 ((SurfacePoint)PointIntersections.First().Target).Group.PointCloud.UpdateBuffers();
 
                 RedrawNeeded = true;
             }
 
-            if (Helper.CtrlDown() && membrane.PreviewGroup.Points.Count == 1)   // Rotate preview point
+            if (KeyboardHelper.CtrlDown() && membrane.PreviewGroup.Points.Count == 1)   // Rotate preview point
             {
-                float Mult = Helper.ShiftDown() ? 30f : 3f;
+                float Mult = KeyboardHelper.ShiftDown() ? 30f : 3f;
                 membrane.PreviewGroup.Points[0].Psi -= e.Delta / 120f * Mult / 180f * (float)Math.PI;
                 membrane.PreviewGroup.Points[0].Group.PointCloud.UpdateBuffers();
                 Options.Viewport.Redraw();
@@ -423,7 +424,7 @@ namespace Membranogram
             {
                 Name = "Group " + (Options.Membrane.PointGroups.Count + 1), 
                 Size = 10,
-                Color = Helper.SpectrumColor(Options.Membrane.PointGroups.Count, 0.3f)
+                Color = ColorHelper.SpectrumColor(Options.Membrane.PointGroups.Count, 0.3f)
             };
             NewGroup.PointCloud.GLContext = Options.Viewport.GetControl();
             Options.Membrane.PointGroups.Add(NewGroup);
@@ -467,7 +468,7 @@ namespace Membranogram
                     {
                         Name = Dialog.SafeFileName.Substring(0, Dialog.SafeFileName.LastIndexOf(".txt")),
                         Size = 10,
-                        Color = Helper.SpectrumColor(Options.Membrane.PointGroups.Count, 0.3f)
+                        Color = ColorHelper.SpectrumColor(Options.Membrane.PointGroups.Count, 0.3f)
                     };
                     NewGroup.PointCloud.GLContext = Options.Viewport.GetControl();
 
@@ -502,7 +503,7 @@ namespace Membranogram
                                     }
                                 }
 
-                                Matrix3 Orientation = ClosestTri.GetPlaneMatrix3();
+                                OpenTK.Matrix3 Orientation = ClosestTri.GetPlaneMatrix3();
                                 if (Parts.Length >= 3 + 9)
                                 {
                                     int Offset = Parts.Length - 9;
@@ -510,7 +511,7 @@ namespace Membranogram
                                     Vector3 C2 = new Vector3(float.Parse(Parts[Offset + 3], IC), float.Parse(Parts[Offset + 4], IC), float.Parse(Parts[Offset + 5], IC));
                                     Vector3 C3 = new Vector3(float.Parse(Parts[Offset + 6], IC), float.Parse(Parts[Offset + 7], IC), float.Parse(Parts[Offset + 8], IC));
 
-                                    Orientation = new Matrix3(C1.X, C2.X, C3.X, C1.Y, C2.Y, C3.Y, C1.Z, C2.Z, C3.Z);
+                                    Orientation = new OpenTK.Matrix3(C1.X, C2.X, C3.X, C1.Y, C2.Y, C3.Y, C1.Z, C2.Z, C3.Z);
                                 }
 
                                 SurfacePoint NewPoint = new SurfacePoint(Position, ClosestTri, Vector3.Zero, 0, Orientation);
@@ -730,11 +731,11 @@ namespace Membranogram
 
             Options.Membrane.DeselectAllTriangles();
 
-            Color PatchColor = Helper.SpectrumColor(Options.Membrane.Patches.Count, 0.2f);
+            Color PatchColor = ColorHelper.SpectrumColor(Options.Membrane.Patches.Count, 0.2f);
             SurfacePatch NewPatch = new SurfacePatch(Options.Membrane, "Patch " + (Options.Membrane.Patches.Count + 1), PatchColor, PatchTriangles);
             Options.Membrane.Patches.Add(NewPatch);
 
-            Options.Membrane.SetTriangleColor(PatchTriangles, Helper.ColorToVector(PatchColor));
+            Options.Membrane.SetTriangleColor(PatchTriangles, ColorHelper.ColorToVector(PatchColor));
             Options.Membrane.SetTrianglePatch(PatchTriangles, NewPatch);
 
             Options.Viewport.GetControl().MakeCurrent();
@@ -810,18 +811,18 @@ namespace Membranogram
                         {
                             Name = XMLHelper.LoadAttribute(groupNav, "Name", "Group " + (Options.Membrane.PointGroups.Count + 1)),
                             Size = XMLHelper.LoadAttribute(groupNav, "Size", 10),
-                            Color = XMLHelper.LoadAttribute(groupNav, "Color", Helper.SpectrumColor(Options.Membrane.PointGroups.Count, 0.3f))
+                            Color = ColorHelper.LoadAttribute(groupNav, "Color", ColorHelper.SpectrumColor(Options.Membrane.PointGroups.Count, 0.3f))
                         };
                         NewGroup.PointCloud.GLContext = Options.Viewport.GetControl();
 
                         foreach (XPathNavigator pointNav in groupNav.SelectChildren("Point", ""))
                         {
                             int TriangleID = XMLHelper.LoadAttribute(pointNav, "ID", 0);
-                            SurfacePoint NewPoint = new SurfacePoint(XMLHelper.LoadAttribute(pointNav, "Position", new Vector3(0)),
+                            SurfacePoint NewPoint = new SurfacePoint(OpenGLHelper.LoadAttribute(pointNav, "Position", new Vector3(0)),
                                                                      Options.Membrane.SurfaceMesh.Triangles[TriangleID < Options.Membrane.SurfaceMesh.Triangles.Count ? TriangleID : 0],
-                                                                     XMLHelper.LoadAttribute(pointNav, "Barycentric", new Vector3(0)),
+                                                                     OpenGLHelper.LoadAttribute(pointNav, "Barycentric", new Vector3(0)),
                                                                      XMLHelper.LoadAttribute(pointNav, "Offset", 0f),
-                                                                     XMLHelper.LoadAttribute(pointNav, "Orientation", new Vector3(0)).X);
+                                                                     OpenGLHelper.LoadAttribute(pointNav, "Orientation", new Vector3(0)).X);
                             NewGroup.Points.Add(NewPoint);
                         }
 
@@ -853,14 +854,14 @@ namespace Membranogram
                         if (Triangles.Count == 0)
                             continue;
 
-                        Color PatchColor = XMLHelper.LoadAttribute(patchNav, "Color", Helper.SpectrumColor(Options.Membrane.Patches.Count, 0.2f));
+                        Color PatchColor = ColorHelper.LoadAttribute(patchNav, "Color", ColorHelper.SpectrumColor(Options.Membrane.Patches.Count, 0.2f));
                         SurfacePatch NewPatch = new SurfacePatch(Options.Membrane,
                                                                  XMLHelper.LoadAttribute(patchNav, "Name", "Patch " + (Options.Membrane.Patches.Count + 1)),
                                                                  PatchColor,
                                                                  Triangles);
                         Options.Membrane.Patches.Add(NewPatch);
 
-                        Options.Membrane.SetTriangleColor(Triangles, Helper.ColorToVector(PatchColor));
+                        Options.Membrane.SetTriangleColor(Triangles, ColorHelper.ColorToVector(PatchColor));
                         Options.Membrane.SetTrianglePatch(Triangles, NewPatch);
 
                         NewPatch.IsVisible = XMLHelper.LoadAttribute(patchNav, "IsVisible", true);
@@ -883,8 +884,8 @@ namespace Membranogram
 
                     Options.Membrane.SelectionAngle = XMLHelper.LoadParamNode(Reader, "SelectionAngle", 90);
 
-                    Options.Viewport.Camera.Target = XMLHelper.LoadParamNode(Reader, "CameraTarget", new Vector3(0));
-                    Options.Viewport.Camera.Rotation = XMLHelper.LoadParamNode(Reader, "CameraRotation", new Quaternion());
+                    Options.Viewport.Camera.Target = OpenGLHelper.LoadParamNode(Reader, "CameraTarget", new Vector3(0));
+                    Options.Viewport.Camera.Rotation = OpenGLHelper.LoadParamNode(Reader, "CameraRotation", new Quaternion());
                     Options.Viewport.Camera.Distance = XMLHelper.LoadParamNode(Reader, "CameraDistance", 1f);
                     Options.Viewport.Camera.FOV = XMLHelper.LoadParamNode(Reader, "CameraFOV", (decimal)(45f / 180f * (float)Math.PI));
                 }
@@ -931,8 +932,8 @@ namespace Membranogram
                 XMLHelper.WriteParamNode(Writer, "SelectionAngle", Options.Membrane.SelectionAngle);
 
                 // Camera
-                XMLHelper.WriteParamNode(Writer, "CameraTarget", Options.Viewport.Camera.Target);
-                XMLHelper.WriteParamNode(Writer, "CameraRotation", Options.Viewport.Camera.Rotation);
+                OpenGLHelper.WriteParamNode(Writer, "CameraTarget", Options.Viewport.Camera.Target);
+                OpenGLHelper.WriteParamNode(Writer, "CameraRotation", Options.Viewport.Camera.Rotation);
                 XMLHelper.WriteParamNode(Writer, "CameraDistance", Options.Viewport.Camera.Distance);
                 XMLHelper.WriteParamNode(Writer, "CameraFOV", Options.Viewport.Camera.FOV);
 
@@ -943,7 +944,7 @@ namespace Membranogram
                         {
                             Writer.WriteStartElement("Group");
                             Writer.WriteAttributeString("Name", group.Name);
-                            Writer.WriteAttributeString("Color", XMLHelper.ColorToString(group.Color));
+                            Writer.WriteAttributeString("Color", ColorHelper.ColorToString(group.Color));
                             Writer.WriteAttributeString("IsVisible", group.IsVisible.ToString(CultureInfo.InvariantCulture));
                             Writer.WriteAttributeString("Size", group.Size.ToString(CultureInfo.InvariantCulture));
 
@@ -961,10 +962,10 @@ namespace Membranogram
                             {
                                 Writer.WriteStartElement("Point");
                                 Writer.WriteAttributeString("ID", point.Face.ID.ToString(CultureInfo.InvariantCulture));
-                                Writer.WriteAttributeString("Position", XMLHelper.Vector3ToString(point.Position));
+                                Writer.WriteAttributeString("Position", OpenGLHelper.Vector3ToString(point.Position));
                                 Writer.WriteAttributeString("Offset", point.SurfaceOffset.ToString(CultureInfo.InvariantCulture));
-                                Writer.WriteAttributeString("Barycentric", XMLHelper.Vector3ToString(point.BarycentricCoords));
-                                Writer.WriteAttributeString("Orientation", XMLHelper.Vector3ToString(new Vector3(point.Psi, 0, 0)));
+                                Writer.WriteAttributeString("Barycentric", OpenGLHelper.Vector3ToString(point.BarycentricCoords));
+                                Writer.WriteAttributeString("Orientation", OpenGLHelper.Vector3ToString(new Vector3(point.Psi, 0, 0)));
 
                                 Writer.WriteEndElement();
                             }
@@ -980,7 +981,7 @@ namespace Membranogram
                         {
                             Writer.WriteStartElement("Patch");
                             Writer.WriteAttributeString("Name", patch.Name);
-                            Writer.WriteAttributeString("Color", XMLHelper.ColorToString(patch.Color));
+                            Writer.WriteAttributeString("Color", ColorHelper.ColorToString(patch.Color));
                             Writer.WriteAttributeString("IsColored", patch.IsColored.ToString(CultureInfo.InvariantCulture));
                             Writer.WriteAttributeString("IsVisible", patch.IsVisible.ToString(CultureInfo.InvariantCulture));
 

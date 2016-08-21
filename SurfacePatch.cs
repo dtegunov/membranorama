@@ -12,6 +12,9 @@ using System.Windows.Threading;
 using Accord.Math.Optimization;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
+using Warp;
+using Warp.Tools;
+using Membranogram.Helpers;
 
 namespace Membranogram
 {
@@ -325,7 +328,7 @@ namespace Membranogram
 
             float Phi = (float)Math.Atan2(FitNormal.Y, FitNormal.X) + (float)Math.PI * 1.5f;
             float Theta = (float)Math.Acos(FitNormal.Z);
-            if (Math.Min(Math.Abs(Theta), Math.Abs(Theta - (float)Math.PI)) < Helper.ToRad(0.5f))
+            if (Math.Min(Math.Abs(Theta), Math.Abs(Theta - (float)Math.PI)) < 0.5f * Helper.ToRad)
                 return;
 
             Matrix4 BackRotate = Matrix4.CreateFromAxisAngle(new Vector3((float)Math.Cos(Phi), (float)Math.Sin(Phi), 0), Theta);
@@ -452,9 +455,9 @@ namespace Membranogram
                     if (Membrane.TomogramTexture != null)
                     {
                         Membrane.MeshProgram.SetUniform("useVolume", 1f);
-                        Membrane.MeshProgram.SetUniform("volScale", Helper.Reciprocal(Membrane.TomogramTexture.Scale));
+                        Membrane.MeshProgram.SetUniform("volScale", OpenGLHelper.Reciprocal(Membrane.TomogramTexture.Scale));
                         Membrane.MeshProgram.SetUniform("volOffset", Membrane.TomogramTexture.Offset);
-                        Membrane.MeshProgram.SetUniform("texSize", Helper.Reciprocal(Membrane.TomogramTexture.Size));
+                        Membrane.MeshProgram.SetUniform("texSize", OpenGLHelper.Reciprocal(Membrane.TomogramTexture.Size));
 
                         GL.ActiveTexture(TextureUnit.Texture0);
                         GL.BindTexture(TextureTarget.Texture3D, Membrane.TomogramTexture.Handle);
@@ -520,7 +523,7 @@ namespace Membranogram
             if (Membrane == null)
                 return;
 
-            Membrane.SetTriangleColor(OriginalToTransformed.Keys, IsColored ? Helper.ColorToVector(Color) : new Vector4(0));
+            Membrane.SetTriangleColor(OriginalToTransformed.Keys, IsColored ? ColorHelper.ColorToVector(Color) : new Vector4(0));
             Membrane.SetTriangleVisible(OriginalToTransformed.Keys, IsVisible);
             MainWindow.Options.Viewport.Redraw();
         }
@@ -657,8 +660,8 @@ namespace Membranogram
 
             Vector3 Extent = SurfaceMesh.GetMax() - SurfaceMesh.GetMin();
             float MaxExtent = Math.Max(Math.Max(Extent.X, Extent.Y), Extent.Z) / 2f;
-            float AngleConditioning = (float) Math.Asin(Math.Min(1f / MaxExtent, Math.Sin(Helper.ToRad(30))));
-            AngleConditioning = Math.Max(1, Helper.ToDeg(AngleConditioning));
+            float AngleConditioning = (float) Math.Asin(Math.Min(1f / MaxExtent, Math.Sin(30 * Helper.ToRad)));
+            AngleConditioning = Math.Max(1, Helper.ToDeg * AngleConditioning);
 
             List<Vector3> AnglesToTry = new List<Vector3> { new Vector3(5, 3, -4), new Vector3(5, 3, 184), new Vector3(185, 3, -4), new Vector3(5, 182, -4) };
             Random Rand = new Random(123);
@@ -669,7 +672,7 @@ namespace Membranogram
 
             Func<double[], double> F = vars =>
             {
-                Vector3 Angles = new Vector3(Helper.ToRad((float)vars[0]), Helper.ToRad((float)vars[1]), Helper.ToRad((float)vars[2])) * AngleConditioning;
+                Vector3 Angles = new Vector3(Helper.ToRad * (float)vars[0], Helper.ToRad * (float)vars[1], Helper.ToRad * (float)vars[2]) * AngleConditioning;
                 Vector3 Shifts = new Vector3((float)vars[3], (float)vars[4], (float)vars[5]);
 
                 Matrix4 Transform = Matrix4.CreateTranslation(Shifts) *
@@ -721,9 +724,9 @@ namespace Membranogram
             }
 
             Matrix4 ToTarget = Matrix4.CreateTranslation(BestTranslation) *
-                                    Matrix4.CreateRotationX(Helper.ToRad(BestRotation.X)) *
-                                    Matrix4.CreateRotationY(Helper.ToRad(BestRotation.Y)) *
-                                    Matrix4.CreateRotationZ(Helper.ToRad(BestRotation.Z));
+                                    Matrix4.CreateRotationX(Helper.ToRad * BestRotation.X) *
+                                    Matrix4.CreateRotationY(Helper.ToRad * BestRotation.Y) *
+                                    Matrix4.CreateRotationZ(Helper.ToRad * BestRotation.Z);
 
             foreach (var v in SurfaceMesh.Vertices)
                 v.Position = Vector4.Transform(new Vector4(v.Position, 1), ToTarget).Xyz;
@@ -789,7 +792,7 @@ namespace Membranogram
         {
             float MeanZ = SurfaceMesh.Triangles.Sum(x => Math.Abs(x.Normal.Z));
             MeanZ /= SurfaceMesh.Triangles.Count;
-            MeanFaceAngle = (decimal)Helper.ToDeg((float)Math.Acos(MeanZ));
+            MeanFaceAngle = (decimal)(Helper.ToDeg * (float)Math.Acos(MeanZ));
 
             float Offset = (float) SurfaceOffset * MainWindow.Options.PixelScale.X;
             float MeanError = SurfaceMesh.Edges.Sum(e => Math.Abs(e.GetOffsetLength(Offset) - e.GetVolumeOffsetLength(Offset)) / Math.Max(1e-4f, e.GetVolumeLength()));

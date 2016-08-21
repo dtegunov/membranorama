@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using OpenTK;
+using Warp;
+using Warp.Headers;
+using Warp.Tools;
 
 namespace Membranogram
 {
@@ -277,7 +280,7 @@ namespace Membranogram
                 if (Info.Extension.ToLower().Contains("mrc"))
                 {
                     HeaderMRC VolumeHeader = (HeaderMRC)MapHeader.ReadFromFile(DepictionMeshPath);
-                    float[] VolumeData = IOHelper.ReadMapFloat(DepictionMeshPath);
+                    float[] VolumeData = IOHelper.ReadSmallMapFloat(DepictionMeshPath, new int2(1, 1), 0, typeof(float));
 
                     Mesh NewMesh = Mesh.FromVolume(VolumeData, VolumeHeader.Dimensions, VolumeHeader.Pixelsize.X, (float)DepictionMeshLevel);
                     NewMesh.UsedComponents = MeshVertexComponents.Position | MeshVertexComponents.Normal;

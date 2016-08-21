@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using System.Xml.XPath;
 using OpenTK;
 using Warp.Tools;
+using Membranogram.Helpers;
 
 namespace Membranogram.Controls
 {
@@ -67,18 +68,18 @@ namespace Membranogram.Controls
                         {
                             Name = XMLHelper.LoadAttribute(groupNav, "Name", "Group " + (MainWindow.Options.Membrane.PointGroups.Count + 1)),
                             Size = XMLHelper.LoadAttribute(groupNav, "Size", 10),
-                            Color = XMLHelper.LoadAttribute(groupNav, "Color", Helper.SpectrumColor(MainWindow.Options.Membrane.PointGroups.Count, 0.3f))
+                            Color = ColorHelper.LoadAttribute(groupNav, "Color", ColorHelper.SpectrumColor(MainWindow.Options.Membrane.PointGroups.Count, 0.3f))
                         };
                         NewGroup.PointCloud.GLContext = MainWindow.Options.Viewport.GetControl();
 
                         foreach (XPathNavigator pointNav in groupNav.SelectChildren("Point", ""))
                         {
                             int TriangleID = XMLHelper.LoadAttribute(pointNav, "ID", 0);
-                            SurfacePoint NewPoint = new SurfacePoint(XMLHelper.LoadAttribute(pointNav, "Position", new Vector3(0)),
+                            SurfacePoint NewPoint = new SurfacePoint(OpenGLHelper.LoadAttribute(pointNav, "Position", new Vector3(0)),
                                                                      MainWindow.Options.Membrane.SurfaceMesh.Triangles[TriangleID < MainWindow.Options.Membrane.SurfaceMesh.Triangles.Count ? TriangleID : 0],
-                                                                     XMLHelper.LoadAttribute(pointNav, "Barycentric", new Vector3(0)),
+                                                                     OpenGLHelper.LoadAttribute(pointNav, "Barycentric", new Vector3(0)),
                                                                      XMLHelper.LoadAttribute(pointNav, "Offset", 0f),
-                                                                     XMLHelper.LoadAttribute(pointNav, "Orientation", new Vector3(0)).X);
+                                                                     OpenGLHelper.LoadAttribute(pointNav, "Orientation", new Vector3(0)).X);
                             NewGroup.Points.Add(NewPoint);
                         }
 

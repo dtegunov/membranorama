@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Membranogram.Controls"
         xmlns:m="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        xmlns:s="clr-namespace:Sparta"
+        xmlns:s="clr-namespace:Sparta;assembly=WarpLib"
         mc:Ignorable="d"
         Title="Point Group Depiction" Height="300" Width="500" BorderThickness="0.5" BorderBrush="{DynamicResource AccentColorBrush}">
     <Window.Resources>
