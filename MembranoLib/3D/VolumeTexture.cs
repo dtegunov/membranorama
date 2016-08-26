@@ -25,9 +25,9 @@ namespace Membranogram
 
             GL.BindTexture(TextureTarget.Texture3D, TextureHandle);
             {
-                GL.TexParameterI(TextureTarget.Texture3D, TextureParameterName.TextureWrapS, new [] { (int)TextureWrapMode.ClampToBorder });
-                GL.TexParameterI(TextureTarget.Texture3D, TextureParameterName.TextureWrapT, new [] { (int)TextureWrapMode.ClampToBorder });
-                GL.TexParameterI(TextureTarget.Texture3D, TextureParameterName.TextureWrapR, new [] { (int)TextureWrapMode.ClampToBorder });
+                GL.TexParameterI(TextureTarget.Texture3D, TextureParameterName.TextureWrapS, new [] { (int)TextureWrapMode.Repeat });
+                GL.TexParameterI(TextureTarget.Texture3D, TextureParameterName.TextureWrapT, new [] { (int)TextureWrapMode.Repeat });
+                GL.TexParameterI(TextureTarget.Texture3D, TextureParameterName.TextureWrapR, new [] { (int)TextureWrapMode.Repeat });
                 GL.TexParameterI(TextureTarget.Texture3D, TextureParameterName.TextureMagFilter, new [] { (int)TextureMagFilter.Linear });
                 GL.TexParameterI(TextureTarget.Texture3D, TextureParameterName.TextureMinFilter, new [] { (int)TextureMinFilter.Linear });
                 GL.TexImage3D<byte>(TextureTarget.Texture3D, 0, PixelInternalFormat.R8, Size.X, Size.Y, Size.Z, 0, PixelFormat.Red, PixelType.UnsignedByte, Data);                
