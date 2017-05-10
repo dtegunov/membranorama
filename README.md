@@ -1,5 +1,5 @@
 # In a nutshell
-![Membranorama screenshot](https://dl.dropboxusercontent.com/u/14045247/membranorama.png)
+![Membranorama screenshot](https://github.com/dtegunov/membranorama/raw/master/membranorama.png)
 
 
 #Membranorama – create and analyze panoramic views of biological membranes in electron tomograms.
