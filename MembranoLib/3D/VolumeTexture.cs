@@ -3,6 +3,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using Warp.Tools;
 using Warp.Headers;
+using System.Collections.Generic;
 
 namespace Membranogram
 {
@@ -22,7 +23,7 @@ namespace Membranogram
             FreeBuffers();
 
             TextureHandle = GL.GenTexture();
-
+            
             GL.BindTexture(TextureTarget.Texture3D, TextureHandle);
             {
                 GL.TexParameterI(TextureTarget.Texture3D, TextureParameterName.TextureWrapS, new [] { (int)TextureWrapMode.Repeat });
@@ -55,7 +56,9 @@ namespace Membranogram
 
             unsafe
             {
-                float[] OriginalData = IOHelper.ReadSmallMapFloat(path, new int2(1, 1), 0, typeof(float));
+                float[][] OriginalSlices = IOHelper.ReadMapFloat(path, new int2(1, 1), 0, typeof(float));
+                float[] OriginalData = Combine(OriginalSlices);
+
                 float DataMin = float.MaxValue, DataMax = float.MinValue;
                 fixed (float* DataPtr = OriginalData)
                 {
@@ -87,6 +90,22 @@ namespace Membranogram
         public void Dispose()
         {
             FreeBuffers();
+        }
+
+        private static T[] Combine<T>(T[][] arrays)
+        {
+            int NElements = 0;
+            foreach (var array in arrays)
+                NElements += array.Length;
+
+            T[] Result = new T[NElements];
+
+            int i = 0;
+            foreach (var array in arrays)
+                for (int j = 0; j < array.Length; j++, i++)
+                    Result[i] = array[j];
+
+            return Result;
         }
     }
 }
