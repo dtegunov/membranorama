@@ -2,7 +2,7 @@
 ![Membranorama screenshot](https://github.com/dtegunov/membranorama/raw/master/membranorama.png)
 
 
-# Membranorama – create and analyze panoramic views of biological membranes in electron tomograms.
+# Membranorama â€“ create and analyze panoramic views of biological membranes in electron tomograms.
 
 
 ## You will need
@@ -26,7 +26,7 @@ Navigate the membranogram:
 
 The initial **intensity range** and **lighting** may not be what you want. Adjust them using the parameters under "Display". If the membranogram is too blurry, adjust the **sharpening** under "Tracing" (this will cost you some GPU resources).
 
-One of the original ideas behind membranograms is to improve the signal-to-noise ratio by **averaging multiple shells** perpendicularly to the membrane. You can set this under "Tracing"; the default is not to average. The averaged shells start at the surface, and then go outwards. If you use multiple shells, you probably want to offset them backwards, so the middle shell is at the membrane – make the offset value -Nshells/2 for that. Depending on how bumpy your surface is, averaging and offsetting will cause a significant distortion. Keep that in mind when interpreting the image.
+One of the original ideas behind membranograms is to improve the signal-to-noise ratio by **averaging multiple shells** perpendicularly to the membrane. You can set this under "Tracing"; the default is not to average. The averaged shells start at the surface, and then go outwards. If you use multiple shells, you probably want to offset them backwards, so the middle shell is at the membrane â€“ make the offset value -Nshells/2 for that. Depending on how bumpy your surface is, averaging and offsetting will cause a significant distortion. Keep that in mind when interpreting the image.
 
 To quickly explore the tomogram space adjacent to the membrane, change the **offset** value under "Surface". This will **shift the entire membrane** perpendicularly to its surface, i. e. along its normals. Any bumps will be amplified with increasing offset, but the tomogram projection itself won't be disturbed.
 
@@ -100,4 +100,4 @@ Take **screenshots** using the aperture button in the window frame next to minim
 
 ## Authorship
 
-Membranorama is being developed by Dimitry Tegunov ([tegunov@gmail.com](mailto:tegunov@gmail.com)), currently in Patrick Cramer's lab at the Max Planck Institute for Biophysical Chemistry in Göttingen, Germany.
+Membranorama is being developed by Dimitry Tegunov ([tegunov@gmail.com](mailto:tegunov@gmail.com)), currently at Genentech, USA.
